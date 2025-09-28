@@ -1,1 +1,8 @@
 @import "tailwindcss";
+
+
+
+/* Button primary color */
+.primaryBtn{
+    @apply bg-[#108062] hover:bg-[#108062d0] rounded-sm px-3 py-2 text-white font-semibold mb-4
+}

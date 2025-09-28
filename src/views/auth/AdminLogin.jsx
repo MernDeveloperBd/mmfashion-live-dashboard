@@ -1,12 +1,15 @@
-import  { useState } from 'react'; // useState hook যোগ করা হয়েছে যদি ভবিষ্যতে স্টেট ম্যানেজমেন্ট এর প্রয়োজন হয়
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
-import { admin_login } from '../../store/Reducers/authReducer';
+import { Link, useNavigate } from 'react-router-dom';
+import { PropagateLoader } from 'react-spinners';
+import { admin_login, messageClear } from '../../store/Reducers/authReducer';
 import { useDispatch, useSelector } from 'react-redux';
 
 const AdminLogin = () => {
-    const dispatch = useDispatch()
-    // ফর্ম ইনপুটগুলোর জন্য স্টেট ম্যানেজমেন্ট (ঐচ্ছিক, তবে ভালো প্র্যাকটিস)
+    const dispatch = useDispatch();
+    const navigate = useNavigate()
+    const { loader, errorMessage, successmessage } = useSelector(state => state.auth); // successmessage (capital M)
+
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -22,11 +25,35 @@ const AdminLogin = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        dispatch(admin_login(formData))
-        console.log('Login Form Submitted:', formData);
-        // এখানে আপনি আপনার রেজিস্ট্রেশন লজিক যোগ করতে পারেন, যেমন API কল
-        toast.success('Login data logged');
+        dispatch(admin_login(formData));
+        // ✅ successmessage এখানে toast করবেন না - এটি useEffect এ করুন
     };
+
+    // loader style
+    const overrideStyle = {
+        display: 'flex',
+        margin: "0 auto",
+        height: '24px',
+        justifyContent: 'center',
+        alignItems: 'center'
+    };
+
+    // ✅ Success message toast
+    useEffect(() => {
+        if (successmessage) {
+            toast.success(successmessage);
+            dispatch(messageClear());
+            // navigate('/')
+        }
+    }, [successmessage, dispatch, navigate]);
+
+    // ✅ Error message toast
+    useEffect(() => {
+        if (errorMessage) {
+            toast.error(errorMessage);
+            dispatch(messageClear());
+        }
+    }, [errorMessage, dispatch]);
 
     return (
         <div className="min-w-screen min-h-screen bg-[#161d31] flex justify-center items-center">
@@ -69,7 +96,7 @@ const AdminLogin = () => {
                         <div className="flex flex-col w-full gap-1 mb-4">
                             <label htmlFor="email">Email</label>
                             <input
-                                type="email" // Changed to type="email"
+                                type="email"
                                 name="email"
                                 id="email"
                                 placeholder="your email"
@@ -84,7 +111,7 @@ const AdminLogin = () => {
                         <div className="flex flex-col w-full gap-1 mb-4">
                             <label htmlFor="password">Password</label>
                             <input
-                                type="password" // Changed to type="password"
+                                type="password"
                                 name="password"
                                 id="password"
                                 placeholder="password"
@@ -95,13 +122,15 @@ const AdminLogin = () => {
                             />
                         </div>
 
-
                         {/* Sign Up Button */}
                         <button
+                            disabled={loader}
                             type="submit"
-                            className="bg-teal-500 w-full hover:bg-teal-600 rounded-md px-3 py-2 text-white font-semibold mb-4 transition-all duration-200"
+                            className={`primaryBtn w-full transition-all duration-200 ${loader ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
                         >
-                            Admin Login
+                            {
+                                loader ? <PropagateLoader color='white' cssOverride={overrideStyle} size={8} /> : "Admin Login"
+                            }
                         </button>
 
                         {/* Already have an account? */}
@@ -124,7 +153,7 @@ const AdminLogin = () => {
                         {/* Social Login Buttons */}
                         <div className="flex justify-center gap-3">
                             <button
-                                type="button" // Important: type="button" for non-submit buttons
+                                type="button"
                                 className="px-3 py-2 flex justify-center items-center gap-2 w-full border border-slate-700 rounded-md hover:bg-slate-700 text-white transition-all duration-200"
                                 onClick={() => alert('Login with Google clicked!')}
                             >

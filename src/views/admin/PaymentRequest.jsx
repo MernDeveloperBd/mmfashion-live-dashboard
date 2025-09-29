@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { HiMiniArrowDownTray } from "react-icons/hi2";
+import Pagination from "../pagination/Pagination";
 
 const PaymentRequest = () => {
+  const [currentPage, setCurrentPage] = useState(1)
+    const [searchValue, setSearchValue] = useState('')
+    const [perPage, setPerPage] = useState(10);
+    const [show, setShow] = useState(false)
   // ডেমো ডেটা (API থেকে ফেচ করে প্রতিস্থাপন করবেন)
   const rows = Array.from({ length: 30 }, (_, i) => ({
     id: `ORD-${1000 + i}`,
@@ -33,7 +38,7 @@ const PaymentRequest = () => {
 
         {/* টেবিল কন্টেইনার (horizontal scrollable on small screens) */}
         <div
-          className="w-full overflow-x-auto"
+          className="w-full overflow-x-auto max-h-[350px]"
           onWheel={handleOnWheel} /* wheel logging */
         >
           <table className="w-full min-w-[800px] text-sm text-left text-[#d0d2d6]">
@@ -106,7 +111,18 @@ const PaymentRequest = () => {
               })}
             </tbody>
           </table>
+          
         </div>
+          {/* pagination */}
+                <div className="w-full flex justify-end mt-4">
+                    <Pagination
+                        pageNumber={currentPage}
+                        setPageNumber={setCurrentPage}
+                        totalItem={500}
+                        perPage={perPage}
+                        showItem={7}
+                    />
+                </div>
       </div>
     </div>
   );

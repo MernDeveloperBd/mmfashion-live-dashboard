@@ -65,7 +65,7 @@ const Sellers = () => {
                                             </td>
                                             <td scope="col" className="py-1 px-2 font-medium whitespace-normal">
                                                 <div className='flex justify-start items-center gap-4'>
-                                                    <Link className='p-[6px] bg-green-500 rounded hover:shadow-lg hover:shadow-yellow-500/50'><FaEye /></Link>
+                                                    <Link to={`/admin/dashboard/seller/details/1`} className='p-[6px] bg-green-500 rounded hover:shadow-lg hover:shadow-yellow-500/50'><FaEye /></Link>
                                                     
 
                                                 </div>

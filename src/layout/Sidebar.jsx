@@ -8,7 +8,7 @@ const Sidebar = ({shoeSidebar, setShowSidebar}) => {
     const location = useLocation();
 
     useEffect(() => {
-        let userRole = 'admin'; 
+        let userRole = 'seller'; 
 
         if (location.pathname.startsWith('/admin')) {
             userRole = 'admin';

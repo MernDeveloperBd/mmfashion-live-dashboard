@@ -6,6 +6,10 @@ import { FiUsers } from "react-icons/fi";
 import { FaUsersCog } from "react-icons/fa";
 import { CiChat1 } from "react-icons/ci";
 import { AiOutlineShoppingCart } from "react-icons/ai";
+import { FaPlus } from "react-icons/fa6";
+import { RiProductHuntLine } from "react-icons/ri";
+import { CiDiscount1 } from "react-icons/ci";
+import { IoChatbubbleOutline } from "react-icons/io5";
 
 export const allNav = [
   {
@@ -60,9 +64,66 @@ export const allNav = [
    {
     id: 8,
     title: 'Chat Seller',
-    icon: CiChat1,
+    icon: IoChatbubbleOutline,
     role: 'admin', // ✅ ছোট হাতের
     path: '/admin/dashboard/chat-seller'
-  }
+  },
+   {
+    id: 9,
+    title: 'Seller Dashboard',
+    icon: MdDashboard,
+    role: 'seller', // ✅ ছোট হাতের
+    path: '/seller/dashboard'
+  },
+   {
+    id: 10,
+    title: 'Add Product',
+    icon: FaPlus,
+    role: 'seller', // ✅ ছোট হাতের
+    path: '/seller/add-product'
+  },
+   {
+    id: 11,
+    title: 'All Product',
+    icon: RiProductHuntLine,
+    role: 'seller', // ✅ ছোট হাতের
+    path: '/seller/all-product'
+  },
+   {
+    id: 12,
+    title: 'Discount Product',
+    icon: CiDiscount1,
+    role: 'seller', // ✅ ছোট হাতের
+    path: '/seller/discount-product'
+  },
+   {
+    id: 13,
+    title: 'Orders',
+    icon: AiOutlineShoppingCart,
+    role: 'seller', // ✅ ছোট হাতের
+    path: '/seller/orders'
+  },
+  
+   {
+    id: 14,
+    title: 'Payment',
+    icon: TbCurrencyTaka,
+    role: 'seller', // ✅ ছোট হাতের
+    path: '/seller/payment'
+  },
+  {
+    id: 15,
+    title: 'Chat Customer',
+    icon: IoChatbubbleOutline,
+    role: 'seller', // ✅ ছোট হাতের
+    path: '/seller/dashboard/chat-customer'
+  },
+  {
+    id: 16,
+    title: 'Chat Support',
+    icon: CiChat1,
+    role: 'seller', // ✅ ছোট হাতের
+    path: '/seller/dashboard/chat-support'
+  },
   
 ];

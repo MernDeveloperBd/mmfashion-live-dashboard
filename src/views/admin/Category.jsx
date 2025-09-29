@@ -29,7 +29,7 @@ const Category = () => {
                                 <option value="20">20</option>
                                 <option value="50">50</option>
                             </select>
-                            <input type="text" placeholder="Search" className="px-4 py-2 focus:border-indigo-500 outline-none bg-[#283046]  border border-slate-700 rounded-md text-white" />
+                            <input type="text" placeholder="Search" className="inputField" />
                         </div>
                         {/* search end */}
                         {/* TAble start */}

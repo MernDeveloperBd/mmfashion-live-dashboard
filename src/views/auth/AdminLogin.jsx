@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { PropagateLoader } from 'react-spinners';
 import { admin_login, messageClear } from '../../store/Reducers/authReducer';
 import { useDispatch, useSelector } from 'react-redux';
+import { overrideStyle } from '../../utils/utils';
 
 const AdminLogin = () => {
     const dispatch = useDispatch();
@@ -29,14 +30,7 @@ const AdminLogin = () => {
         // ✅ successmessage এখানে toast করবেন না - এটি useEffect এ করুন
     };
 
-    // loader style
-    const overrideStyle = {
-        display: 'flex',
-        margin: "0 auto",
-        height: '24px',
-        justifyContent: 'center',
-        alignItems: 'center'
-    };
+   
 
     // ✅ Success message toast
     useEffect(() => {
@@ -122,9 +116,9 @@ const AdminLogin = () => {
                             />
                         </div>
 
-                        {/* Sign Up Button */}
+                        {/* Login  Button */}
                         <button
-                            disabled={loader}
+                            disabled={loader ? true : false}
                             type="submit"
                             className={`primaryBtn w-full transition-all duration-200 ${loader ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
                         >

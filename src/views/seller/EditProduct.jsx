@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BsImage } from 'react-icons/bs';
-import { IoCloseSharp } from "react-icons/io5";
 
-const AddProduct = () => {
+const EditProduct = () => {
     const categories = [
         {
             id: 1,
@@ -50,47 +48,41 @@ const AddProduct = () => {
             setAllCategory(categories)
         }
     }
-    const [images, setImages] = useState([])
+   
     const [imageShow, setImageShow] = useState([])
-    const imageHandle = (e) => {
-        const files = e.target.files
-        const length = files.length;
-        if (length > 0) {
-            setImages([...images, ...files])
-            let imgUrl = []
-            for (let i = 0; i < length; i++) {
-                imgUrl.push({ url: URL.createObjectURL(files[i]) })
-            }
-            setImageShow([...imageShow, ...imgUrl])
-        }
-    }
-    console.log(images);
-    console.log(imageShow);
+  
 
-    const changeImage = (img, index) => {
-        if (img) {
-            let tempUrl = imageShow
-            let tempImages = images
+    const changeImage = (img, files) => {
+     if(files.length > 0){
+        console.log(img);
+        console.log(files[0]);
+        
+     }
+    } 
 
-            tempImages[index] = img
-            tempUrl[index] = { url: URL.createObjectURL(img) }
-            setImageShow([...tempUrl])
-            setImages([...tempImages])
-        }
-    }
-
-    const removeImage = (i) => {
-        const filterImage = images.filter((img, index) => index !== i)
-        const filterImageUrl = imageShow.filter((img, index) => index !== i)
-        setImages(filterImage)
-        setImageShow(filterImageUrl)
-    }
+    useEffect(() =>{
+        setState({
+             name: "Cotton Three piece",
+        description: "Descript for this product",
+        price: 540,
+        oldPrice: 590,
+        discount: 5,
+        resellingPrice: 450,
+        brand: "Silk",
+        stock: 15
+        })
+        setCategory("Fashion")
+        setImageShow([
+            "https://res.cloudinary.com/dpd5xwjqp/image/upload/v1757668954/Misam_Marifa_Fashion_World_oo94yx.png",
+            "https://res.cloudinary.com/dpd5xwjqp/image/upload/v1757668954/Misam_Marifa_Fashion_World_oo94yx.png",
+        ])
+    },[])
 
     return (
         <div className="px-2 md:px-7 md:py-5">
             <div className="w-full bg-[#283046] p-4 rounded-md">
                 <div className='flex justify-between items-center pb-4'>
-                    <h1 className='text-[#d0d2d6] text-xl font-semibold'>Add Product</h1>
+                    <h1 className='text-[#d0d2d6] text-xl font-semibold'>Edit Product</h1>
                     <Link className='primaryBtn ' to='/seller/products'>Products</Link>
                 </div>
                 <div>
@@ -164,26 +156,19 @@ const AddProduct = () => {
 
                         </div>
                         {/* image */}
-                        <div className='grid grid-cols-2 lg:grid-cols-5 md:grid-cols-3  md:gap-4 xs:gap-4 gap-3 w-full text-[#d0d2d6]'>
-
+                        <div className='grid grid-cols-2 lg:grid-cols-5 md:grid-cols-3  md:gap-4 xs:gap-4 gap-3 w-full text-[#d0d2d6] cursor-pointer'>                     
                             {
                                 imageShow?.map((img, i) => <div key={i} className='h-[160px] relative'>
                                     <label htmlFor={i}>
-                                        <img src={img.url} alt="" className='w-full h-full rounded-sm' />
+                                        <img src={img} alt="" />
                                     </label>
-                                    <input onChange={(e) => changeImage(e.target.files[0], i)} type="file" id={i} className='hidden' />
-                                    <span onClick={() => removeImage(i)} className='p-2 z-10 cursor-pointer bg-gray-800  rounded-full hover:bg-[#d0d2d6] transition-all duration-300 hover:text-black text-white absolute top-0 right-0'><IoCloseSharp /></span>
+                                    <input onChange={(e)=>changeImage(img, e.target.files)} type="file" name="" id={i} className='hidden'/>
                                 </div>)
-                            }
-                            <label className='flex justify-center items-center flex-col h-[160px] cursor-pointer border border-dashed hover:border-teal-500 w-full' htmlFor="image">
-                                <span><BsImage /></span>
-                                <span>Select Image</span>
-                            </label>
-                            <input multiple onChange={imageHandle} type='file' id='image' className='hidden' />
+                            }                            
 
                         </div>
-                        <div className='flex my-4'>
-                            <button className='primaryBtn'>Add Product</button>
+                        <div className=' my-4 md:mt-12'>
+                            <button className='primaryBtn'>Update Product</button>
                         </div>
                     </form>
                 </div>
@@ -193,4 +178,4 @@ const AddProduct = () => {
     );
 };
 
-export default AddProduct;
+export default EditProduct;

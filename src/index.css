@@ -4,7 +4,7 @@
 
 /* Button primary color */
 .primaryBtn{
-    @apply bg-[#108062] hover:bg-[#108062d0] rounded-sm px-3 py-2 text-white font-semibold mb-4 cursor-pointer
+    @apply bg-[#108062] hover:bg-[#108062d0] rounded-sm px-3 py-2 text-white font-semibold cursor-pointer
 }
 .inputField{
     @apply px-4 py-2 focus:border-indigo-500 outline-none bg-[#283046]  border border-slate-700 rounded-md text-white

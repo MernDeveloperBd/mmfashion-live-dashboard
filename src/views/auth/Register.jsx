@@ -1,15 +1,21 @@
-import React, { useState } from 'react'; // useState hook যোগ করা হয়েছে যদি ভবিষ্যতে স্টেট ম্যানেজমেন্ট এর প্রয়োজন হয়
+import  { useEffect, useState } from 'react'; 
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+import{useSelector, useDispatch} from 'react-redux'
+import { overrideStyle } from '../../utils/utils';
+import { PropagateLoader } from 'react-spinners';
+import { messageClear, seller_register } from '../../store/Reducers/authReducer';
 
 const Register = () => {
-    // ফর্ম ইনপুটগুলোর জন্য স্টেট ম্যানেজমেন্ট (ঐচ্ছিক, তবে ভালো প্র্যাকটিস)
+    const{loader, successmessage, errorMessage} = useSelector(state => state.auth)
+    const dispatch = useDispatch()
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
         agreeToTerms: false,
     });
+ 
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -22,9 +28,19 @@ const Register = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log('Register Form Submitted:', formData);
-        // এখানে আপনি আপনার রেজিস্ট্রেশন লজিক যোগ করতে পারেন, যেমন API কল
-        toast.success('Registration data logged to console. In a real app, this would send data to a server.');
+        dispatch(seller_register(formData))
     };
+
+    useEffect(() =>{
+        if(successmessage){
+             toast.success(successmessage);
+             dispatch(messageClear())
+        }
+        if(errorMessage){
+             toast.error(errorMessage);
+             dispatch(messageClear())
+        }
+    },[successmessage, errorMessage, dispatch])
 
     return (
         <div className="min-w-screen min-h-screen bg-[#161d31] flex justify-center items-center">
@@ -97,11 +113,14 @@ const Register = () => {
                         </div>
 
                         {/* Sign Up Button */}
-                        <button
+                         <button
+                            disabled={loader}
                             type="submit"
-                            className="bg-teal-500 w-full hover:bg-teal-600 rounded-md px-3 py-2 text-white font-semibold mb-4 transition-all duration-200"
+                            className={`primaryBtn w-full transition-all duration-200 ${loader ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
                         >
-                            Sign Up
+                            {
+                                loader ? <PropagateLoader color='white' cssOverride={overrideStyle} size={8} /> : "Sign Up"
+                            }
                         </button>
 
                         {/* Already have an account? */}

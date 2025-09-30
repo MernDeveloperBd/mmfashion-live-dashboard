@@ -1,15 +1,13 @@
-import { MdCategory } from "react-icons/md";
-    import { MdDashboard } from "react-icons/md";
-import { FaUserGroup } from "react-icons/fa6";
+import { MdCategory , MdDashboard} from "react-icons/md";
+import { FaUserGroup, FaPlus } from "react-icons/fa6";
 import { TbCurrencyTaka } from "react-icons/tb";
 import { FiUsers } from "react-icons/fi";
 import { FaUsersCog } from "react-icons/fa";
-import { CiChat1 } from "react-icons/ci";
+import { CiChat1, CiDiscount1 } from "react-icons/ci";
 import { AiOutlineShoppingCart } from "react-icons/ai";
-import { FaPlus } from "react-icons/fa6";
-import { RiProductHuntLine } from "react-icons/ri";
-import { CiDiscount1 } from "react-icons/ci";
+import { RiProductHuntLine, RiProfileLine } from "react-icons/ri";
 import { IoChatbubbleOutline } from "react-icons/io5";
+
 
 export const allNav = [
   {
@@ -87,7 +85,7 @@ export const allNav = [
     title: 'All Product',
     icon: RiProductHuntLine,
     role: 'seller', // ✅ ছোট হাতের
-    path: '/seller/all-product'
+    path: '/seller/products'
   },
    {
     id: 12,
@@ -124,6 +122,13 @@ export const allNav = [
     icon: CiChat1,
     role: 'seller', // ✅ ছোট হাতের
     path: '/seller/dashboard/chat-support'
+  },
+  {
+    id: 17,
+    title: 'Profile',
+    icon: RiProfileLine,
+    role: 'seller', // ✅ ছোট হাতের
+    path: '/seller/dashboard/profile'
   },
   
 ];

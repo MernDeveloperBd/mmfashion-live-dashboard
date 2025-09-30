@@ -4,9 +4,9 @@ import Pagination from "../pagination/Pagination";
 
 const PaymentRequest = () => {
   const [currentPage, setCurrentPage] = useState(1)
-    const [searchValue, setSearchValue] = useState('')
-    const [perPage, setPerPage] = useState(10);
-    const [show, setShow] = useState(false)
+  const [searchValue, setSearchValue] = useState('')
+  const [perPage, setPerPage] = useState(10);
+  const [show, setShow] = useState(false)
   // ডেমো ডেটা (API থেকে ফেচ করে প্রতিস্থাপন করবেন)
   const rows = Array.from({ length: 30 }, (_, i) => ({
     id: `ORD-${1000 + i}`,
@@ -35,11 +35,9 @@ const PaymentRequest = () => {
     <div className="px-2 md:px-7 md:py-5">
       <div className="w-full p-4 bg-[#283046] rounded-md text-[#d0d2d6]">
         <h2 className="text-xl font-medium pb-4">Withdraw request</h2>
-
-        {/* টেবিল কন্টেইনার (horizontal scrollable on small screens) */}
         <div
           className="w-full overflow-x-auto max-h-[350px]"
-          onWheel={handleOnWheel} /* wheel logging */
+          onWheel={handleOnWheel}
         >
           <table className="w-full min-w-[800px] text-sm text-left text-[#d0d2d6]">
             {/* Header */}
@@ -64,11 +62,10 @@ const PaymentRequest = () => {
                       <td className="p-2">{row.amount}</td>
                       <td className="p-2">
                         <span
-                          className={`py-[2px] px-2 rounded text-xs ${
-                            row.status === "Paid"
+                          className={`py-[2px] px-2 rounded text-xs ${row.status === "Paid"
                               ? "bg-green-600 text-white"
                               : "bg-slate-700 text-blue-300"
-                          }`}
+                            }`}
                         >
                           {row.status}
                         </span>
@@ -111,18 +108,18 @@ const PaymentRequest = () => {
               })}
             </tbody>
           </table>
-          
+
         </div>
-          {/* pagination */}
-                <div className="w-full flex justify-end mt-4">
-                    <Pagination
-                        pageNumber={currentPage}
-                        setPageNumber={setCurrentPage}
-                        totalItem={500}
-                        perPage={perPage}
-                        showItem={7}
-                    />
-                </div>
+        {/* pagination */}
+        <div className="w-full flex justify-end mt-4">
+          <Pagination
+            pageNumber={currentPage}
+            setPageNumber={setCurrentPage}
+            totalItem={500}
+            perPage={perPage}
+            showItem={7}
+          />
+        </div>
       </div>
     </div>
   );

@@ -1,9 +1,14 @@
-import React, { useState } from 'react'; // useState hook যোগ করা হয়েছে যদি ভবিষ্যতে স্টেট ম্যানেজমেন্ট এর প্রয়োজন হয়
+import  { useEffect, useState } from 'react'; // useState hook যোগ করা হয়েছে যদি ভবিষ্যতে স্টেট ম্যানেজমেন্ট এর প্রয়োজন হয়
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+import { overrideStyle } from '../../utils/utils';
+import { useDispatch, useSelector } from 'react-redux';
+import { messageClear, seller_login } from '../../store/Reducers/authReducer';
+import { PropagateLoader } from 'react-spinners';
 
 const Login = () => {
-    // ফর্ম ইনপুটগুলোর জন্য স্টেট ম্যানেজমেন্ট (ঐচ্ছিক, তবে ভালো প্র্যাকটিস)
+    const { loader, errorMessage, successmessage } = useSelector(state => state.auth);
+    const dispatch = useDispatch()
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -20,9 +25,21 @@ const Login = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log('Login Form Submitted:', formData);
+        dispatch(seller_login(formData));
         // এখানে আপনি আপনার রেজিস্ট্রেশন লজিক যোগ করতে পারেন, যেমন API কল
-        toast.success('Login successful');
+       
     };
+
+      useEffect(() =>{
+        if(successmessage){
+             toast.success(successmessage);
+             dispatch(messageClear())
+        }
+        if(errorMessage){
+             toast.error(errorMessage);
+             dispatch(messageClear())
+        }
+    },[successmessage, errorMessage, dispatch])
 
     return (
         <div className="min-w-screen min-h-screen bg-[#161d31] flex justify-center items-center">
@@ -66,10 +83,13 @@ const Login = () => {
 
                         {/* Sign Up Button */}
                         <button
+                            disabled={loader ? true : false}
                             type="submit"
-                            className="bg-teal-500 w-full hover:bg-teal-600 rounded-md px-3 py-2 text-white font-semibold mb-4 transition-all duration-200"
+                            className={`primaryBtn w-full transition-all duration-200 ${loader ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
                         >
-                            Login
+                            {
+                                loader ? <PropagateLoader color='white' cssOverride={overrideStyle} size={8} /> : "Login"
+                            }
                         </button>
 
                         {/* Already have an account? */}

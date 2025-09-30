@@ -29,9 +29,7 @@ export default function App() {
     const [allRoutes, setAllRoutes] = useState([...publicRoutes]);
 
     useEffect(() => {
-        const privateRoute = getRoutes();
-        console.log("privat", privateRoute);
-        
+        const privateRoute = getRoutes();        
         setAllRoutes([...publicRoutes, privateRoute]);
     }, []);
 

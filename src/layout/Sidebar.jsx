@@ -1,13 +1,15 @@
  import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useSelector } from "react-redux";
 import { getNavs } from '../navigation/navigation';
 import { FiLogOut } from 'react-icons/fi';
 
 const Sidebar = ({shoeSidebar, setShowSidebar}) => {
+    const{role} = useSelector(state => state.auth)
     const [allNav, setAllNav] = useState([]);
     const location = useLocation();
 
-    useEffect(() => {
+   /*  useEffect(() => {
         let userRole = 'seller'; 
 
         if (location.pathname.startsWith('/admin')) {
@@ -19,6 +21,13 @@ const Sidebar = ({shoeSidebar, setShowSidebar}) => {
         const navs = getNavs(userRole);
         setAllNav(navs);
     }, [location.pathname]); 
+    console.log(allNav, location.pathname); */
+
+     useEffect(() => {    
+
+        const navs = getNavs(role);
+        setAllNav(navs);
+    }, [role]); 
     console.log(allNav, location.pathname);
 
     return (

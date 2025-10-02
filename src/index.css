@@ -1,7 +1,41 @@
 @import "tailwindcss";
 
+/* smooth scrolling */
+html {
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable both-edges;
+}
 
+body {
+  overflow-y: auto;
+}
 
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.07); /* subtle */
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255,255,255,0.12);
+}
+
+/* Firefox: thin + color */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.07) transparent;
+}
+
+html.always-gutter body {
+  overflow-y: scroll; 
+}
 /* Button primary color */
 .primaryBtn{
     @apply bg-[#108062] hover:bg-[#108062d0] rounded-sm px-3 py-2 text-white font-semibold cursor-pointer

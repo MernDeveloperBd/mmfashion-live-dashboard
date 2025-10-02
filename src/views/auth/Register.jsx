@@ -1,6 +1,6 @@
 import  { useEffect, useState } from 'react'; 
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import{useSelector, useDispatch} from 'react-redux'
 import { overrideStyle } from '../../utils/utils';
 import { PropagateLoader } from 'react-spinners';
@@ -9,6 +9,7 @@ import { messageClear, seller_register } from '../../store/Reducers/authReducer'
 const Register = () => {
     const{loader, successmessage, errorMessage} = useSelector(state => state.auth)
     const dispatch = useDispatch()
+    const navigate = useNavigate()
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -35,12 +36,13 @@ const Register = () => {
         if(successmessage){
              toast.success(successmessage);
              dispatch(messageClear())
+             navigate('/')
         }
         if(errorMessage){
              toast.error(errorMessage);
              dispatch(messageClear())
         }
-    },[successmessage, errorMessage, dispatch])
+    },[successmessage, errorMessage,navigate, dispatch])
 
     return (
         <div className="min-w-screen min-h-screen bg-[#161d31] flex justify-center items-center">

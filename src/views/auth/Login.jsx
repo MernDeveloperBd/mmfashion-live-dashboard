@@ -1,6 +1,6 @@
 import  { useEffect, useState } from 'react'; // useState hook যোগ করা হয়েছে যদি ভবিষ্যতে স্টেট ম্যানেজমেন্ট এর প্রয়োজন হয়
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { overrideStyle } from '../../utils/utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { messageClear, seller_login } from '../../store/Reducers/authReducer';
@@ -9,6 +9,7 @@ import { PropagateLoader } from 'react-spinners';
 const Login = () => {
     const { loader, errorMessage, successmessage } = useSelector(state => state.auth);
     const dispatch = useDispatch()
+    const navigate = useNavigate()
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -24,22 +25,20 @@ const Login = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Login Form Submitted:', formData);
-        dispatch(seller_login(formData));
-        // এখানে আপনি আপনার রেজিস্ট্রেশন লজিক যোগ করতে পারেন, যেমন API কল
-       
+        dispatch(seller_login(formData))       
     };
 
       useEffect(() =>{
         if(successmessage){
              toast.success(successmessage);
              dispatch(messageClear())
+             navigate('/')
         }
         if(errorMessage){
              toast.error(errorMessage);
              dispatch(messageClear())
         }
-    },[successmessage, errorMessage, dispatch])
+    },[successmessage,navigate, errorMessage, dispatch])
 
     return (
         <div className="min-w-screen min-h-screen bg-[#161d31] flex justify-center items-center">

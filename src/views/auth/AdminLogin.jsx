@@ -27,17 +27,14 @@ const AdminLogin = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         dispatch(admin_login(formData));
-        // ✅ successmessage এখানে toast করবেন না - এটি useEffect এ করুন
-    };
-
-   
+    };   
 
     // ✅ Success message toast
     useEffect(() => {
         if (successmessage) {
             toast.success(successmessage);
             dispatch(messageClear());
-            // navigate('/')
+            navigate('/')
         }
     }, [successmessage, dispatch, navigate]);
 

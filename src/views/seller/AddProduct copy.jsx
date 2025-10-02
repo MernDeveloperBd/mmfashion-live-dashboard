@@ -256,7 +256,7 @@ const AddProduct = () => {
               <input name="price" value={state.price} onChange={inputHandle} type="number" placeholder='price' id='price' className='inputField' min={0} />
             </div>
             <div className='flex flex-col gap-1 w-full'>
-              <label htmlFor="oldPrice" >Old Price</label>
+              <label htmlFor="oldPrice" className='text-red-500'>Old Price</label>
               <input name="oldPrice" value={state.oldPrice} onChange={inputHandle} type="number" placeholder='oldPrice' id='oldPrice' className='inputField' min={0} />
               {errors.oldPrice && <p className="text-red-400 text-sm mt-1">{errors.oldPrice}</p>}
             </div>

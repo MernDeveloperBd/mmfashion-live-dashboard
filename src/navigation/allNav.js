@@ -7,7 +7,7 @@ import { CiChat1, CiDiscount1 } from "react-icons/ci";
 import { AiOutlineShoppingCart } from "react-icons/ai";
 import { RiProductHuntLine, RiProfileLine } from "react-icons/ri";
 import { IoChatbubbleOutline } from "react-icons/io5";
-
+import { PiFlagBannerDuotone } from "react-icons/pi";
 
 export const allNav = [
   {
@@ -37,6 +37,13 @@ export const allNav = [
     icon: FaUserGroup,
     role: 'admin', // ✅ ছোট হাতের
     path: '/admin/dashboard/sellers'
+  },
+   {
+    id: 19,
+    title: 'All Users',
+    icon: FaUserGroup,
+    role: 'admin', // ✅ ছোট হাতের
+    path: '/admin/dashboard/users'
   },
    {
     id: 5,
@@ -82,20 +89,34 @@ export const allNav = [
   },
    {
     id: 11,
-    title: 'All Product',
+    title: 'My Products',
     icon: RiProductHuntLine,
     role: 'seller', // ✅ ছোট হাতের
     path: '/seller/products'
   },
-   {
+    {
     id: 12,
+    title: 'All Products',
+    icon: RiProductHuntLine,
+    role: 'seller', // ✅ ছোট হাতের
+    path: '/seller/all-products'
+  },
+   {
+    id: 13,
     title: 'Discount Product',
     icon: CiDiscount1,
     role: 'seller', // ✅ ছোট হাতের
     path: '/seller/discount-product'
   },
    {
-    id: 13,
+    id: 20,
+    title: 'All Banner',
+    icon: PiFlagBannerDuotone,
+    role: 'seller', // ✅ ছোট হাতের
+    path: '/seller/banners'
+  },
+   {
+    id: 14,
     title: 'Orders',
     icon: AiOutlineShoppingCart,
     role: 'seller', // ✅ ছোট হাতের
@@ -103,32 +124,33 @@ export const allNav = [
   },
   
    {
-    id: 14,
+    id: 15,
     title: 'Payment',
     icon: TbCurrencyTaka,
     role: 'seller', // ✅ ছোট হাতের
     path: '/seller/payment'
   },
   {
-    id: 15,
+    id: 16,
     title: 'Chat Customer',
     icon: IoChatbubbleOutline,
     role: 'seller', // ✅ ছোট হাতের
     path: '/seller/dashboard/chat-customer'
   },
   {
-    id: 16,
+    id: 17,
     title: 'Chat Support',
     icon: CiChat1,
     role: 'seller', // ✅ ছোট হাতের
     path: '/seller/dashboard/chat-support'
   },
   {
-    id: 17,
+    id: 18,
     title: 'Profile',
     icon: RiProfileLine,
     role: 'seller', // ✅ ছোট হাতের
     path: '/seller/dashboard/profile'
   },
+ 
   
 ];

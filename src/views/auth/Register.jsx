@@ -7,7 +7,7 @@ import { PropagateLoader } from 'react-spinners';
 import { messageClear, seller_register } from '../../store/Reducers/authReducer';
 
 const Register = () => {
-    const{loader, successmessage, errorMessage} = useSelector(state => state.auth)
+    const{loader, successMessage, errorMessage} = useSelector(state => state.auth)
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [formData, setFormData] = useState({
@@ -28,13 +28,12 @@ const Register = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Register Form Submitted:', formData);
         dispatch(seller_register(formData))
     };
 
     useEffect(() =>{
-        if(successmessage){
-             toast.success(successmessage);
+        if(successMessage){
+             toast.success(successMessage);
              dispatch(messageClear())
              navigate('/')
         }
@@ -42,7 +41,7 @@ const Register = () => {
              toast.error(errorMessage);
              dispatch(messageClear())
         }
-    },[successmessage, errorMessage,navigate, dispatch])
+    },[successMessage, errorMessage,navigate, dispatch])
 
     return (
         <div className="min-w-screen min-h-screen bg-[#161d31] flex justify-center items-center">

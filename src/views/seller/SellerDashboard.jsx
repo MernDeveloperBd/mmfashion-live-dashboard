@@ -1,211 +1,250 @@
 import { TbCoinTaka } from "react-icons/tb";
 import { RiProductHuntLine } from "react-icons/ri";
-import { FaUsers } from "react-icons/fa6";
 import { AiOutlineShoppingCart } from "react-icons/ai";
-import Chart from 'react-apexcharts'
+import Chart from 'react-apexcharts';
 import { Link } from "react-router-dom";
+import customer from '../../assets/seller.png';
+import { useSelector, useDispatch } from 'react-redux';
+import { get_seller_dashboard_index_data } from '../../store/Reducers/dashboardIndexReducer';
+import moment from 'moment';
+import { useEffect, useMemo } from "react";
 
 const SellerDashboard = () => {
-    const state = {
-        series: [
-            {
-                name: "Orders",
-                data: [30, 40, 35, 50, 49, 60, 70, 91, 15, 19, 27, 68]
-            },
-            {
-                name: "Revinue",
-                data: [50, 47, 35, 50, 59, 40, 10, 41, 25, 19, 27, 78]
-            },
-            {
-                name: "Sales",
-                data: [15, 47, 33, 77, 45, 24, 47, 14, 14, 19, 16, 24]
-            }
-        ],
-        options: {
-            color: ['#181ee8', '#181ee8'],
-            plotOptions: {
-                radious: 30
-            },
-            chart: {
-                background: 'transparent',
-                foreColor: '#d0d2d6'
-            },
-            datalabels: {
-                enabled: false
-            },
-            stroke: {
-                show: true,
-                curve: ['smooth', 'straight', 'stepline'],
-                lineCap: 'butt',
-                colors: '#f0f0f0',
-                width: .5,
-                dashArrow: 0
-            },
-            xAxis: {
-                categories: ['jan', 'feb', 'march', 'April', 'May', 'June', 'july', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-            },
-            legeng: {
-                position: 'top'
-            },
-            responsive: [
-                {
-                    breakPoint: 565,
-                    yaxis: {
-                        categories: ['jan', 'feb', 'march', 'April', 'May', 'June', 'july', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-                    },
-                    options: {
-                        plotOptions: {
-                            bar: {
-                                horizontal: true
-                            }
-                        },
-                        chart: {
-                            height: '550px'
-                        }
-                    }
-                }
-            ]
-        }
+  const dispatch = useDispatch();
+  const { userInfo } = useSelector(state => state.auth);
+  const {
+    totalSale = 0,
+    totalOrder = 0,
+    totalProduct = 0,
+    totalPendingOrder = 0,
+    recentOrders = [],
+    recentMessage = []
+  } = useSelector(state => state.dashboardIndex);
+
+  const fmtTk = (n) => `TK ${Number(n || 0).toLocaleString()}`;
+  const badge = (type, val) => {
+    const base = 'px-2 py-1 rounded text-xs';
+    if (type === 'payment') {
+      if (val === 'paid') return `${base} bg-emerald-600/20 text-emerald-300`;
+      if (val === 'unpaid' || val === 'pending') return `${base} bg-amber-600/20 text-amber-300`;
+      return `${base} bg-slate-600/20 text-slate-300`;
     }
-    return (
-        <div className="px-2 md:px-7 md:py-5">
-            <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-7">
-                {/* first div */}
-                <div className="flex justify-between items-center p-5 bg-[#283046] rounded-md gap-3">
-                    <div className="flex flex-col justify-start items-start text-[#d0d2d6]">
-                        <h2 className="text-2xl font-bold">TK 5600</h2>
-                        <span className="text-md font-medium">Total Sales</span>
-                    </div>
-                    <div className="w-[40px] h-[47px] rounded-full bg-[#108062] flex justify-center items-center text-3xl">
-                        <TbCoinTaka className="text-white" />
-                    </div>
-                </div>
-                {/* second div */}
-                <div className="flex justify-between items-center p-5 bg-[#283046] rounded-md gap-3">
-                    <div className="flex flex-col justify-start items-start text-[#d0d2d6]">
-                        <h2 className="text-2xl font-bold">20</h2>
-                        <span className="text-md font-medium">Products</span>
-                    </div>
-                    <div className="w-[40px] h-[47px] rounded-full bg-[#e000e81f] flex justify-center items-center text-3xl">
-                        <RiProductHuntLine className="" />
-                    </div>
-                </div>
-                {/* first div */}
-                <div className="flex justify-between items-center p-5 bg-[#283046] rounded-md gap-3">
-                    <div className="flex flex-col justify-start items-start text-[#d0d2d6]">
-                        <h2 className="text-2xl font-bold">18</h2>
-                        <span className="text-md font-medium">Orders</span>
-                    </div>
-                    <div className="w-[40px] h-[47px] rounded-full bg-[#108062] flex justify-center items-center text-3xl">
-                        <AiOutlineShoppingCart className="text-[#00cfe8]" />
-                    </div>
-                </div>
-                {/* first div */}
-                <div className="flex justify-between items-center p-5 bg-[#283046] rounded-md gap-3">
-                    <div className="flex flex-col justify-start items-start text-[#d0d2d6]">
-                        <h2 className="text-2xl font-bold">38</h2>
-                        <span className="text-md font-medium">Pending Orders</span>
-                    </div>
-                    <div className="w-[40px] h-[47px] rounded-full bg-[#108062] flex justify-center items-center text-3xl">
-                        <AiOutlineShoppingCart className="text-white" />
-                    </div>
-                </div>
-            </div>
-            {/* charts */}
-            <div className="w-full flex flex-wrap mt-4">
-                <div className="w-full lg:w-7/12 lg:pr-3">
-                    <div className="w-full bg-[#283046] p-4 rounded-md">
-                        <Chart options={state.options} series={state.series} type="bar" width={500} height={350} />
-                    </div>
-                </div>
-                {/* seller chat */}
-                <div className="w-full lg:w-5/12 mt-4 lg:mt-0">
-                    <div className="w-full bg-[#283046] p-4 rounded-md text-[#d0d2d6]">
-                        <div className="flex justify-between items-center">
-                            <h2 className="font-semibold text-lg text-[#d0d2d6] pb-3">Recent Customer message</h2>
-                            <Link className="font-semibold text-sm text-[#d0d2d6]">View all</Link>
-                        </div>
-                        <div className="flex flex-col gap-2 pt-6 text-[#d0d2d6]">
-                            <ol className="relative border-1 border-slate-600 ml-4 p-1">
-                                <li className="mb-3 ml-6">
-                                    <div className="flex absolute -left-5 shadow-lg justify-center items-center w-10 h-10 p-[6px] bg-[#00d1e848] rounded-full z-10">
-                                        <img className=" w-full h-full rounded-full shadow-lg" src="https://res.cloudinary.com/dpd5xwjqp/image/upload/v1757668954/Misam_Marifa_Fashion_World_oo94yx.png" alt="seller-image" />
-                                    </div>
-                                    <div className="p-3 bg-slate-900 rounded-lg border border-slate-600 shadow-sm">
-                                        <div className="flex justify-between items-center mb-2">
-                                            <Link className="text-md font-normal">Customer name</Link>
-                                            <time className="mb-1 text-sm font-normal sm:order-last sm:mb-0">4 days ago</time>
-                                        </div>
-                                        <div className="p-2 text-xs font-normal bg-slate-700 border border-slate-800 rounded-sm">
-                                            how are you?
-                                        </div>
-                                    </div>
-                                </li>
+    if (val === 'delivered' || val === 'completed' || val === 'placed' || val === 'warehouse')
+      return `${base} bg-emerald-600/20 text-emerald-300`;
+    if (val === 'cancelled') return `${base} bg-rose-600/20 text-rose-300`;
+    if (val === 'pending' || val === 'processing') return `${base} bg-amber-600/20 text-amber-300`;
+    return `${base} bg-slate-600/20 text-slate-300`;
+  };
 
-                                <li className="mb-3 ml-6">
-                                    <div className="flex absolute -left-5 shadow-lg justify-center items-center w-10 h-10 p-[6px] bg-[#00d1e848] rounded-full z-10">
-                                        <img className=" w-full h-full rounded-full shadow-lg" src="https://res.cloudinary.com/dpd5xwjqp/image/upload/v1757668954/Misam_Marifa_Fashion_World_oo94yx.png" alt="seller-image" />
-                                    </div>
-                                    <div className="p-3 bg-slate-900 rounded-lg border border-slate-600 shadow-sm">
-                                        <div className="flex justify-between items-center mb-2">
-                                            <Link className="text-md font-normal">Seller name</Link>
-                                            <time className="mb-1 text-sm font-normal sm:order-last sm:mb-0">4 days ago</time>
-                                        </div>
-                                        <div className="p-2 text-xs font-normal bg-slate-700 border border-slate-800 rounded-sm">
-                                            how are you?
-                                        </div>
-                                    </div>
-                                </li>
+  const chartState = useMemo(() => ({
+    series: [
+      { name: "Orders", data: [30, 40, 35, 50, 49, 60, 70, 91, 15, 19, 27, 68] },
+      { name: "Revenue", data: [50, 47, 35, 50, 59, 40, 10, 41, 25, 19, 27, 78] },
+      { name: "Sales", data: [15, 47, 33, 77, 45, 24, 47, 14, 14, 19, 16, 24] }
+    ],
+    options: {
+      chart: { background: 'transparent', foreColor: '#d0d2d6', toolbar: { show: false }, height: 360 },
+      colors: ['#00E396', '#FEB019', '#008FFB'],
+      dataLabels: { enabled: false },
+      stroke: { curve: 'smooth', width: 2 },
+      grid: { borderColor: '#334155' },
+      xaxis: { categories: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] },
+      legend: { position: 'top', labels: { colors: '#d0d2d6' } },
+      responsive: [
+        { breakpoint: 1280, options: { chart: { height: 340 } } },
+        { breakpoint: 1024, options: { chart: { height: 320 } } },
+        { breakpoint: 768,  options: { chart: { height: 300 } } },
+        { breakpoint: 640,  options: { chart: { height: 280 } } },
+      ]
+    }
+  }), []);
 
-                            </ol>
+  useEffect(() => {
+    dispatch(get_seller_dashboard_index_data());
+  }, [dispatch]);
 
-                        </div>
-
-                    </div>
-
-                </div>
-            </div>
-            {/* Recent Orders */}
-            <div className="w-full p-4 bg-[#283046] rounded-lg mt-6">
-                <div className="flex justify-between items-center">
-                    <h2 className="font-semibold text-lg text-[#d0d2d6] pb-3">Recent Orders</h2>
-                    <Link className="font-semibold text-sm text-[#d0d2d6]">View all</Link>
-                </div>
-                <div className="relative overflow-x-auto">
-                    <table className="w-full text-sm text-left text-[#d0d2d6]">
-                        <thead className="text-sm text-[#d0d2d6] uppercase border-b border-slate-700">
-                            <tr>
-                                <th scope="col" className="py-3 px-4">Order id</th>
-                                <th scope="col" className="py-3 px-4">Price</th>
-                                <th scope="col" className="py-3 px-4">Payment Status</th>
-                                <th scope="col" className="py-3 px-4">Order Status</th>
-                                <th scope="col" className="py-3 px-4">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                [1,2,3,4].map((d,i)=> <tr key={i}>
-                                <td scope="col" className="py-4 px-4 font-medium whitespace-normal">#254685</td>
-                                <td scope="col" className="py-4 px-4 font-medium whitespace-normal">TK652</td>
-                                <td scope="col" className="py-4 px-4 font-medium whitespace-normal">
-                                    <span>Pending</span>
-                                </td>
-                                <td scope="col" className="py-4 px-4 font-medium whitespace-normal">
-                                    <span>Pending</span>
-                                </td>
-                                <td scope="col" className="py-4 px-4 font-medium whitespace-normal">
-                                    <Link>view</Link>
-                                </td>
-                            </tr>)
-                            }
-                            
-                        </tbody>
-                    </table>
-
-                </div>
-            </div>
+  return (
+    <div className="px-2 md:px-7 md:py-5">
+      {/* Stat cards */}
+      <div className="w-full grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+        <div className="flex justify-between items-center p-4 sm:p-5 bg-[#283046] rounded-xl ring-1 ring-slate-700/50 hover:-translate-y-[2px] transition">
+          <div className="text-[#d0d2d6]">
+            <h2 className="text-xl sm:text-2xl font-bold">{fmtTk(totalSale)}</h2>
+            <span className="text-xs sm:text-sm">Total Sales</span>
+          </div>
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-600/20 flex justify-center items-center text-xl sm:text-2xl">
+            <TbCoinTaka className="text-emerald-300" />
+          </div>
         </div>
-    );
+
+        <div className="flex justify-between items-center p-4 sm:p-5 bg-[#283046] rounded-xl ring-1 ring-slate-700/50 hover:-translate-y-[2px] transition">
+          <div className="text-[#d0d2d6]">
+            <h2 className="text-xl sm:text-2xl font-bold">{totalProduct}</h2>
+            <span className="text-xs sm:text-sm">Products</span>
+          </div>
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-indigo-600/20 flex justify-center items-center text-xl sm:text-2xl">
+            <RiProductHuntLine className="text-indigo-300" />
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center p-4 sm:p-5 bg-[#283046] rounded-xl ring-1 ring-slate-700/50 hover:-translate-y-[2px] transition">
+          <div className="text-[#d0d2d6]">
+            <h2 className="text-xl sm:text-2xl font-bold">{totalOrder}</h2>
+            <span className="text-xs sm:text-sm">Orders</span>
+          </div>
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-cyan-600/20 flex justify-center items-center text-xl sm:text-2xl">
+            <AiOutlineShoppingCart className="text-cyan-300" />
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center p-4 sm:p-5 bg-[#283046] rounded-xl ring-1 ring-slate-700/50 hover:-translate-y-[2px] transition">
+          <div className="text-[#d0d2d6]">
+            <h2 className="text-xl sm:text-2xl font-bold">{totalPendingOrder}</h2>
+            <span className="text-xs sm:text-sm">Pending Orders</span>
+          </div>
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-600/20 flex justify-center items-center text-xl sm:text-2xl">
+            <AiOutlineShoppingCart className="text-amber-300" />
+          </div>
+        </div>
+      </div>
+
+      {/* Chart + Messages */}
+      <div className="w-full flex flex-col lg:flex-row gap-3 lg:gap-4 mt-5">
+        <div className="w-full lg:w-7/12">
+          <div className="w-full bg-[#283046] p-3 sm:p-4 rounded-xl ring-1 ring-slate-700/50">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-[#d0d2d6] font-semibold">Overview</h3>
+            </div>
+            <div className="w-full">
+              <Chart options={chartState.options} series={chartState.series} type="area" width="100%" height={chartState.options.chart.height} />
+            </div>
+          </div>
+        </div>
+
+        <div className="w-full lg:w-5/12">
+          <div className="w-full bg-[#283046] p-3 sm:p-4 rounded-xl ring-1 ring-slate-700/50 text-[#d0d2d6]">
+            <div className="flex justify-between items-center">
+              <h2 className="font-semibold text-base sm:text-lg">Recent Customer Messages</h2>
+              <Link className="font-semibold text-xs sm:text-sm text-slate-300 hover:text-white">View all</Link>
+            </div>
+
+            <div className="mt-3 max-h-80 overflow-y-auto pr-1">
+              <ol className="relative ml-4">
+                {(recentMessage || []).length ? (
+                  recentMessage.map((m, i) => (
+                    <li key={i} className="mb-4 ml-6">
+                      <span className="absolute -left-5 w-9 h-9 sm:w-10 sm:h-10 rounded-full ring-2 ring-slate-700 overflow-hidden bg-slate-700">
+                        {m.senderId === userInfo?._id ? (
+                          <img className="w-full h-full object-cover" src={userInfo?.image} alt="me" />
+                        ) : (
+                          <img className="w-full h-full object-cover" src={customer} alt="customer" />
+                        )}
+                      </span>
+
+                      <div className="p-3 bg-slate-800 rounded-lg border border-slate-700">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-medium">{m.senderName}</span>
+                          <time className="text-[11px] text-slate-300">
+                            {m?.createdAt ? moment(m.createdAt).startOf('minute').fromNow() : '-'}
+                          </time>
+                        </div>
+                        <div className="p-2 text-xs bg-slate-700/60 rounded border border-slate-700">
+                          {m.message}
+                        </div>
+                      </div>
+                    </li>
+                  ))
+                ) : (
+                  <div className="text-slate-400 text-sm mt-2">No recent messages</div>
+                )}
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Orders */}
+      <div className="w-full p-3 sm:p-4 bg-[#283046] rounded-xl ring-1 ring-slate-700/50 mt-6">
+        <div className="flex justify-between items-center">
+          <h2 className="font-semibold text-base sm:text-lg text-[#d0d2d6]">Recent Orders</h2>
+          <Link to="/seller/dashboard/orders" className="font-semibold text-xs sm:text-sm text-slate-300 hover:text-white">
+            View all
+          </Link>
+        </div>
+
+        {/* Mobile card list */}
+        <div className="mt-3 grid gap-3 md:hidden">
+          {(recentOrders || []).length ? (
+            recentOrders.map((d, i) => (
+              <div key={i} className="p-3 rounded-lg bg-slate-800 border border-slate-700">
+                <div className="flex justify-between text-sm">
+                  <span className="font-medium">#{d?._id}</span>
+                  <span>{fmtTk(d?.price)}</span>
+                </div>
+                <div className="flex justify-between mt-2">
+                  <span className={badge('payment', d?.payment_status)}>{d?.payment_status || '-'}</span>
+                  <span className={badge('delivery', d?.delivery_status)}>{d?.delivery_status || '-'}</span>
+                </div>
+                <div className="mt-3">
+                  <Link
+                    to={`seller/dashboard/order/details/${d?._id}`}
+                    className="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-xs"
+                  >
+                    View
+                  </Link>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-slate-400 text-sm">No recent orders</div>
+          )}
+        </div>
+
+        {/* Desktop table */}
+        <div className="relative overflow-x-auto mt-3 hidden md:block">
+          <table className="w-full text-sm text-left text-[#d0d2d6]">
+            <thead className="text-xs uppercase border-b border-slate-700">
+              <tr>
+                <th className="py-3 px-4">Order ID</th>
+                <th className="py-3 px-4">Price</th>
+                <th className="py-3 px-4">Payment</th>
+                <th className="py-3 px-4">Order Status</th>
+                <th className="py-3 px-4">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(recentOrders || []).length ? (
+                recentOrders.map((d, i) => (
+                  <tr key={i} className="border-b border-slate-800">
+                    <td className="py-3 px-4 font-medium whitespace-nowrap">#{d?._id}</td>
+                    <td className="py-3 px-4">{fmtTk(d?.price)}</td>
+                    <td className="py-3 px-4">
+                      <span className={badge('payment', d?.payment_status)}>{d?.payment_status || '-'}</span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className={badge('delivery', d?.delivery_status)}>{d?.delivery_status || '-'}</span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <Link
+                        to={`/seller/dashboard/order/details/${d?._id}`}
+                        className="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-xs"
+                      >
+                        View
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td className="py-4 px-4 text-slate-400" colSpan={5}>No recent orders</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default SellerDashboard;

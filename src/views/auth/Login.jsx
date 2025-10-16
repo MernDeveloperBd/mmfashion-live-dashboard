@@ -7,7 +7,7 @@ import { messageClear, seller_login } from '../../store/Reducers/authReducer';
 import { PropagateLoader } from 'react-spinners';
 
 const Login = () => {
-    const { loader, errorMessage, successmessage } = useSelector(state => state.auth);
+    const { loader, errorMessage, successMessage } = useSelector(state => state.auth);
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [formData, setFormData] = useState({
@@ -29,8 +29,8 @@ const Login = () => {
     };
 
       useEffect(() =>{
-        if(successmessage){
-             toast.success(successmessage);
+        if(successMessage){
+             toast.success(successMessage);
              dispatch(messageClear())
              navigate('/')
         }
@@ -38,7 +38,7 @@ const Login = () => {
              toast.error(errorMessage);
              dispatch(messageClear())
         }
-    },[successmessage,navigate, errorMessage, dispatch])
+    },[successMessage,navigate, errorMessage, dispatch])
 
     return (
         <div className="min-w-screen min-h-screen bg-[#161d31] flex justify-center items-center">

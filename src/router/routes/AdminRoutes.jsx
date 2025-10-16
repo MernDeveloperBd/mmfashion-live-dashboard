@@ -6,6 +6,7 @@ const AdminDashboard = lazy(() => import('../../views/admin/AdminDashboard'));
 const Orders = lazy(() => import('../../views/admin/Orders'));
 const Category = lazy(() => import('../../views/admin/Category'));
 const Sellers = lazy(() => import('../../views/admin/Sellers'));
+const Users = lazy(() => import('../../views/admin/Users'));
 const PaymentRequest = lazy(() => import('../../views/admin/PaymentRequest'));
 const DeactiveSellers = lazy(() => import('../../views/admin/DeactiveSellers'));
 const SellerRequest = lazy(() => import('../../views/admin/SellerRequest'));
@@ -35,6 +36,11 @@ const AdminRoutes = [
         role: 'admin'
     },
     {
+        path: 'admin/dashboard/users',
+        element: <Users />,
+        role: 'admin'
+    },
+    {
         path: 'admin/dashboard/payment-request',
         element: <PaymentRequest />,
         role: 'admin'
@@ -60,7 +66,12 @@ const AdminRoutes = [
         role: 'admin'
     },
      {
-        path: 'admin/dashboard/order/details/:id',
+        path: 'admin/dashboard/chat-seller/:sellerId',
+        element: <ChatSellers />,
+        role: 'admin'
+    },
+     {
+        path: 'admin/dashboard/order/details/:orderId',
         element: <OrderDetails />,
         role: 'admin'
     },

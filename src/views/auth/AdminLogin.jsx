@@ -9,7 +9,7 @@ import { overrideStyle } from '../../utils/utils';
 const AdminLogin = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate()
-    const { loader, errorMessage, successmessage } = useSelector(state => state.auth); // successmessage (capital M)
+    const { loader, errorMessage, successMessage } = useSelector(state => state.auth); // successMessage (capital M)
 
     const [formData, setFormData] = useState({
         email: '',
@@ -31,12 +31,12 @@ const AdminLogin = () => {
 
     // ✅ Success message toast
     useEffect(() => {
-        if (successmessage) {
-            toast.success(successmessage);
+        if (successMessage) {
+            toast.success(successMessage);
             dispatch(messageClear());
             navigate('/')
         }
-    }, [successmessage, dispatch, navigate]);
+    }, [successMessage, dispatch, navigate]);
 
     // ✅ Error message toast
     useEffect(() => {

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../Api/api';
+import api from '../../api/api';
 
 // NB: api instance যদি baseURL = '/api' হয়, তাহলে সব পাথ '/chat/...' রাখুন, '/api/chat/...' নয়।
 

@@ -18,8 +18,6 @@ const api = axios.create({
 })
 
 
-
-
 // Authorization interceptor (unchanged)
 api.interceptors.request.use(
   (config) => {

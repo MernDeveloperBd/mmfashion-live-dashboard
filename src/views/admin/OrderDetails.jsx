@@ -14,7 +14,7 @@ import {
 import { FiHash, FiCalendar, FiUser, FiMapPin, FiPackage } from 'react-icons/fi';
 
 // NEW: import the component
-import BkashManualPay from '../components/BkashManualPay';
+import BkashManualPay from '../Components/BkashManualPay';
 
 const badgeCls = (type, val) => {
   const base = 'px-2 py-1 rounded text-xs';

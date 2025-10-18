@@ -48,7 +48,11 @@ export const dashboardIndexReducer = createSlice({
         totalPendingOrder: 0,
         totalSeller: 0,
         recentOrders: [],
-        recentMessage: []
+        recentMessage: [],
+        // Chart data fields
+        chartOrders: [],
+        chartRevenue: [],
+        chartSellers: []
     },
     reducers: {
         messageClear: (state) => {
@@ -59,23 +63,39 @@ export const dashboardIndexReducer = createSlice({
     extraReducers: (builder) => {
         builder
             // pending seller requests
-
-            .addCase(get_seller_dashboard_index_data.fulfilled, (state, { payload }) => {
-                state.totalSale = payload.totalSale
-                state.totalOrder = payload.totalOrder
-                state.totalProduct = payload.totalProduct
-                state.totalPendingOrder = payload.totalPendingOrder
-                state.recentOrders = payload.recentOrders
-                state.recentMessage = payload.messages
+ .addCase(get_seller_dashboard_index_data.fulfilled, (state, { payload }) => {
+                state.totalSale = payload.totalSale;
+                state.totalOrder = payload.totalOrder;
+                state.totalProduct = payload.totalProduct;
+                state.totalPendingOrder = payload.totalPendingOrder;
+                state.recentOrders = payload.recentOrders;
+                state.recentMessage = payload.messages;
+                // Add chart data
+                state.chartOrders = payload.chartOrders || [];
+                state.chartRevenue = payload.chartRevenue || [];
+                state.chartSellers = payload.chartSellers || [];
             })
             .addCase(get_admin_dashboard_index_data.fulfilled, (state, { payload }) => {
-                state.totalSale = payload.totalSale
-                state.totalOrder = payload.totalOrder
-                state.totalProduct = payload.totalProduct
-                state.totalSeller = payload.totalSeller
-                state.recentOrders = payload.recentOrders
-                state.recentMessage = payload.messages
+                state.totalSale = payload.totalSale;
+                state.totalOrder = payload.totalOrder;
+                state.totalProduct = payload.totalProduct;
+                state.totalSeller = payload.totalSeller;
+                state.recentOrders = payload.recentOrders;
+                state.recentMessage = payload.messages;
+                // Add chart data
+                state.chartOrders = payload.chartOrders || [];
+                state.chartRevenue = payload.chartRevenue || [];
+                state.chartSellers = payload.chartSellers || [];
             })
+            // Error handling cases
+            .addCase(get_seller_dashboard_index_data.rejected, (state, action) => {
+                console.error("Failed to fetch seller dashboard data:", action.payload);
+            })
+            .addCase(get_admin_dashboard_index_data.rejected, (state, action) => {
+                console.error("Failed to fetch admin dashboard data:", action.payload);
+            });
+    
+
 
 
     },

@@ -1,18 +1,26 @@
-/* import axios from "axios"
+
+
+import axios from 'axios'
+const local = 'http://localhost:5000'
+const production = 'https://mmfashion-live-server.onrender.com'
+
+let api_url = ''
+let mode = 'pro'
+if (mode === 'pro') {
+    api_url = production
+} else {
+    api_url = local
+}
 
 const api = axios.create({
-    baseURL: "http://localhost:5000/api"
+    baseURL: `${api_url}/api`,
+    withCredentials: true
 })
-export default api; */
 
-import axios from "axios";
 
-const api = axios.create({
-  baseURL: "http://localhost:5000/api",
-  withCredentials: true
-});
 
-// Attach Authorization header automatically
+
+// Authorization interceptor (unchanged)
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');

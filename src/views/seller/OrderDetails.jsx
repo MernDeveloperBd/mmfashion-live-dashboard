@@ -45,6 +45,11 @@ const SellerOrderDetails = () => {
   }, [successMessage, errorMessage, dispatch]);
 
   const fmtPrice = (n) => (typeof n === 'number' ? n.toLocaleString() : n);
+  useEffect(() => {
+  if (!orderId) return;
+  const t = setInterval(() => dispatch(get_seller_order(orderId)), 95000);
+  return () => clearInterval(t);
+}, [dispatch,orderId]);
 
   return (
     <div className="px-2 md:px-7 py-5">

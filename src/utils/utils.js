@@ -1,5 +1,5 @@
- // loader style
-    
+ 
+    const API_URL = import.meta.env.VITE_API_URL
  import io from 'socket.io-client'
  export const overrideStyle = {
         display: 'flex',
@@ -9,5 +9,5 @@
         alignItems: 'center'
     };
 
-    export const socket = io("http://localhost:5000")
+    export const socket = io(API_URL)
     

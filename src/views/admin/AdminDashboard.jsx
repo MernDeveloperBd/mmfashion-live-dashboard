@@ -42,28 +42,75 @@ const AdminDashboard = () => {
     return `${base} bg-slate-600/20 text-slate-300`;
   };
 
-  const chartState = useMemo(() => ({
-    series: [
-      { name: "Orders", data: [30, 40, 35, 50, 49, 60, 70, 91, 15, 19, 27, 68] },
-      { name: "Revenue", data: [50, 47, 35, 50, 59, 40, 10, 41, 25, 19, 27, 78] },
-      { name: "Sellers", data: [15, 47, 33, 77, 45, 24, 47, 14, 14, 19, 16, 24] }
-    ],
-    options: {
-      chart: { background: 'transparent', foreColor: '#d0d2d6', toolbar: { show: false }, height: 360 },
-      colors: ['#00E396', '#FEB019', '#008FFB'],
-      dataLabels: { enabled: false },
-      stroke: { curve: 'smooth', width: 2 },
-      grid: { borderColor: '#334155' },
-      xaxis: { categories: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] },
-      legend: { position: 'top', labels: { colors: '#d0d2d6' } },
-      responsive: [
-        { breakpoint: 1280, options: { chart: { height: 340 } } },
-        { breakpoint: 1024, options: { chart: { height: 320 } } },
-        { breakpoint: 768,  options: { chart: { height: 300 } } },
-        { breakpoint: 640,  options: { chart: { height: 280 } } },
-      ]
-    }
+  // Overview: dynamic monthly aggregation
+  const MONTHS = useMemo(() => ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], []);
+  const chartBaseOptions = useMemo(() => ({
+    chart: { background: 'transparent', foreColor: '#d0d2d6', toolbar: { show: false }, height: 360 },
+    colors: ['#00E396', '#FEB019', '#008FFB'], // Orders, Revenue, Sellers
+    dataLabels: { enabled: false },
+    stroke: { curve: 'smooth', width: 2 },
+    grid: { borderColor: '#334155' },
+    legend: { position: 'top', labels: { colors: '#d0d2d6' } },
+    tooltip: { y: { formatter: (val) => Number(val || 0).toLocaleString() } },
+    responsive: [
+      { breakpoint: 1280, options: { chart: { height: 340 } } },
+      { breakpoint: 1024, options: { chart: { height: 320 } } },
+      { breakpoint: 768,  options: { chart: { height: 300 } } },
+      { breakpoint: 640,  options: { chart: { height: 280 } } },
+    ]
   }), []);
+
+  const parseOrderMoment = (o) => {
+    if (o?.createdAt) {
+      const m = moment(o.createdAt);
+      if (m.isValid()) return m;
+    }
+    if (o?.date) {
+      const m = moment(o.date, [moment.ISO_8601, 'YYYY-MM-DD', 'DD-MM-YYYY', 'MM/DD/YYYY', 'YYYY/MM/DD'], true);
+      if (m.isValid()) return m;
+      const fallback = moment(o.date);
+      if (fallback.isValid()) return fallback;
+    }
+    return null;
+  };
+
+  const { categories, series } = useMemo(() => {
+    const categories = MONTHS;
+    const orders = Array(12).fill(0);
+    const revenue = Array(12).fill(0);
+    const sellersSet = Array.from({ length: 12 }, () => new Set()); // Active sellers per month
+
+    (recentOrders || []).forEach((o) => {
+      const m = parseOrderMoment(o);
+      if (!m) return;
+
+      // শুধুমাত্র চলতি বছর চাইলে আনকমেন্ট করুন
+      // if (m.year() !== moment().year()) return;
+
+      const idx = m.month(); // 0-11
+      orders[idx] += 1;
+      revenue[idx] += Number(o?.price || 0);
+
+      // Sellers: ঐ মাসে অর্ডার পাওয়া ইউনিক seller/shop
+      if (Array.isArray(o?.products)) {
+        o.products.forEach(p => {
+          const sellerId = p?.sellerId ?? p?.seller_id ?? p?.sellerID ?? p?.shopId ?? p?.shop_id ?? p?.shopID;
+          if (sellerId) sellersSet[idx].add(String(sellerId));
+        });
+      }
+    });
+
+    const sellers = sellersSet.map(s => s.size);
+
+    return {
+      categories,
+      series: [
+        { name: "Orders", data: orders },
+        { name: "Revenue", data: revenue.map(n => Number(n.toFixed(2))) },
+        { name: "Sellers", data: sellers }
+      ]
+    };
+  }, [recentOrders, MONTHS]);
 
   return (
     <div className="px-2 md:px-7 md:py-5">
@@ -117,7 +164,13 @@ const AdminDashboard = () => {
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-[#d0d2d6] font-semibold">Overview</h3>
             </div>
-            <Chart options={chartState.options} series={chartState.series} type="area" width="100%" height={chartState.options.chart.height} />
+            <Chart
+              options={{ ...chartBaseOptions, xaxis: { categories } }}
+              series={series}
+              type="area"
+              width="100%"
+              height={chartBaseOptions.chart.height}
+            />
           </div>
         </div>
 

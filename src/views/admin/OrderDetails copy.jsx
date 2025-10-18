@@ -13,8 +13,6 @@ import {
 
 import { FiHash, FiCalendar, FiUser, FiMapPin, FiPackage } from 'react-icons/fi';
 
-// NEW: import the component
-import BkashManualPay from '../components/BkashManualPay';
 
 const badgeCls = (type, val) => {
   const base = 'px-2 py-1 rounded text-xs';
@@ -51,7 +49,7 @@ const skeleton = (
 );
 
 const OrderDetails = () => {
-  const { orderId } = useParams(); // route: /admin/dashboard/order/details/:orderId
+  const { orderId } = useParams(); // route: /dashboard/order/details/:orderId
   const dispatch = useDispatch();
 
   const {
@@ -60,7 +58,6 @@ const OrderDetails = () => {
   } = useSelector(state => state.order);
 
   const [status, setStatus] = useState('');
-  
 
   // Order লোড
   useEffect(() => {
@@ -193,11 +190,6 @@ const OrderDetails = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* NEW: Customer manual bKash pay widget (show only if unpaid) */}
-                {order?.payment_status !== 'paid' && (
-                  <BkashManualPay orderId={order?._id} amount={order?.price} />
-                )}
 
                 {/* BKash Payments (manual submissions) */}
                 <div className="bg-slate-800/50 rounded-md p-4 border border-slate-700/50">

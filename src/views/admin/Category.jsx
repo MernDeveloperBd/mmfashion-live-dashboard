@@ -53,13 +53,10 @@ function SubCategorySection() {
     }));
   }, [dispatch, selectedCat, page, perPage, searchValue]);
 
-  // Reset form on success; toast handled by parent
+  // Reset form on success
   useEffect(() => {
     if (successMessage?.toLowerCase().includes('sub category')) {
       setName(''); setFile(null); setPreview('');
-    }
-    if (errorMessage?.toLowerCase().includes('sub category')) {
-      // parent toast will show; no need to duplicate
     }
   }, [successMessage, errorMessage]);
 
@@ -73,19 +70,28 @@ function SubCategorySection() {
     e.preventDefault();
     if (!selectedCat) return toast.error('Select parent category');
     if (!name.trim()) return toast.error('Sub category name is required');
-    if (!file) return toast.error('Image is required');
     dispatch(subCategoryAdd({ categoryId: selectedCat, name: name.trim(), image: file }));
   };
 
   const catNameById = (id) => catOptions.find(c => c._id === id)?.name || '-';
 
   return (
-    <div className="mt-6 bg-[#283046] p-4 rounded-md">
-      <h3 className="text-[#d0d2d6] font-semibold mb-3">Sub Categories</h3>
+    <div className="mt-6 relative bg-gradient-to-br from-[#2b3349] to-[#21293d] border border-slate-700/60 p-5 rounded-xl shadow-xl">
+      {/* Loader overlay */}
+      {loader ? (
+        <div className="absolute inset-0 grid place-items-center bg-[#0f1625]/40 backdrop-blur-sm rounded-xl z-10">
+          <PropagateLoader color="#3de0c2" cssOverride={overrideStyle} size={10} />
+        </div>
+      ) : null}
+
+      <div className="flex items-center gap-2 mb-4">
+        <span className="w-1.5 h-6 bg-teal-500 rounded-full" />
+        <h3 className="text-[#e6e8ee] font-semibold tracking-wide">Sub Categories</h3>
+      </div>
 
       <form onSubmit={onAdd} className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
         <select
-          className="px-3 py-2 bg-[#283046] border border-slate-700 rounded text-[#d0d2d6]"
+          className="px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg text-[#d0d2d6] focus:outline-none focus:ring-2 focus:ring-teal-500/60 focus:border-teal-500/40 placeholder-slate-400"
           value={selectedCat}
           onChange={(e)=>{ setSelectedCat(e.target.value); setPage(1); }}
         >
@@ -93,62 +99,77 @@ function SubCategorySection() {
           {catOptions.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
         </select>
         <input
-          className="px-3 py-2 bg-[#283046] border border-slate-700 rounded text-[#d0d2d6]"
+          className="px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg text-[#d0d2d6] focus:outline-none focus:ring-2 focus:ring-teal-500/60 focus:border-teal-500/40 placeholder-slate-400"
           placeholder="Sub category name"
           value={name}
           onChange={(e)=>setName(e.target.value)}
         />
         <div className="flex items-center gap-2">
-          <label htmlFor="sub-file" className="px-3 py-1.5 bg-slate-700 rounded cursor-pointer">Choose Image</label>
+          <label htmlFor="sub-file" className="px-3 py-2 bg-slate-700/80 hover:bg-slate-700 text-[#e6e8ee] rounded-lg cursor-pointer transition">
+            Choose Image
+          </label>
           <input id="sub-file" type="file" accept="image/*" className="hidden" onChange={onFile}/>
-          <button disabled={loader} className="px-3 py-1.5 bg-teal-600 text-white rounded disabled:opacity-60 cursor-pointer">
+          <button disabled={loader} className="px-3 py-2 rounded-lg bg-gradient-to-r from-teal-600 to-teal-500 text-white disabled:opacity-60 hover:from-teal-500 hover:to-teal-400 transition cursor-pointer">
             {loader ? 'Saving...' : 'Add Sub Category'}
           </button>
         </div>
-        {preview ? <img src={preview} alt="preview" className="h-16 rounded border md:col-span-3"/> : null}
+        {preview ? (
+          <div className="md:col-span-3">
+            <img src={preview} alt="preview" className="h-20 rounded-lg border border-slate-700 ring-1 ring-slate-700/50 shadow-md object-cover" />
+          </div>
+        ) : null}
       </form>
 
       {selectedCat ? (
         <>
           <Search setPerPage={setPerPage} setSearchValue={setSearchValue} searchValue={searchValue} />
-          <div className="relative overflow-x-auto mt-3">
-            <table className="w-full text-sm text-left text-[#d0d2d6]">
-              <thead className="uppercase border-b border-slate-700">
-                <tr>
-                  <th className="py-3 px-4">No</th>
-                  <th className="py-3 px-4">Image</th>
-                  <th className="py-3 px-4">Name</th>
-                  <th className="py-3 px-4">Category</th>
-                  <th className="py-3 px-4">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {subCategories?.length ? subCategories.map((s, i) => (
-                  <tr key={s._id} className="border-b border-slate-700/60">
-                    <td className="py-2 px-4">{(page-1)*perPage + i + 1}</td>
-                    <td className="py-2 px-4">
-                      {s.image ? <img src={s.image} className="w-10 h-10 object-cover rounded border" alt="subCategory_image" /> : '-'}
-                    </td>
-                    <td className="py-2 px-4">{s.name}</td>
-                    <td className="py-2 px-4">{catNameById(s.categoryId)}</td>
-                    <td className="py-2 px-4">
-                      <button
-                        onClick={()=> {
-                          const ok = window.confirm('Delete this sub category?');
-                          if (ok) dispatch(delete_sub_category(s._id));
-                        }}
-                        className="p-[6px] bg-red-500 rounded hover:shadow-lg hover:shadow-red-500/50 cursor-pointer"
-                        title="Delete"
-                      >
-                        <MdDelete />
-                      </button>
-                    </td>
+
+          <div className="relative overflow-hidden mt-3 rounded-lg border border-slate-700/60">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left text-[#d0d2d6]">
+                <thead className="uppercase text-[12px] tracking-wider bg-slate-800/70 backdrop-blur border-b border-slate-700 sticky top-0 z-[1]">
+                  <tr>
+                    <th className="py-3.5 px-4">No</th>
+                    <th className="py-3.5 px-4">Image</th>
+                    <th className="py-3.5 px-4">Name</th>
+                    <th className="py-3.5 px-4">Category</th>
+                    <th className="py-3.5 px-4">Action</th>
                   </tr>
-                )) : (
-                  <tr><td colSpan="5" className="py-6 px-4 text-center text-slate-400">No sub categories found</td></tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-700/60">
+                  {subCategories?.length ? subCategories.map((s, i) => (
+                    <tr key={s._id} className="hover:bg-slate-700/30 transition">
+                      <td className="py-2.5 px-4">{(page-1)*perPage + i + 1}</td>
+                      <td className="py-2.5 px-4">
+                        {s.image ? (
+                          <img src={s.image} className="w-10 h-10 object-cover rounded-md border border-slate-700" alt="subCategory_image" />
+                        ) : '-'}
+                      </td>
+                      <td className="py-2.5 px-4">{s.name}</td>
+                      <td className="py-2.5 px-4">{catNameById(s.categoryId)}</td>
+                      <td className="py-2.5 px-4">
+                        <button
+                          onClick={()=> {
+                            const ok = window.confirm('Delete this sub category?');
+                            if (ok) dispatch(delete_sub_category(s._id));
+                          }}
+                          className="p-[6px] bg-rose-500/90 hover:bg-rose-500 text-white rounded-md hover:shadow-lg hover:shadow-rose-500/30 cursor-pointer transition"
+                          title="Delete"
+                        >
+                          <MdDelete />
+                        </button>
+                      </td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan="5" className="py-10 px-4 text-center text-slate-400">
+                        No sub categories found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <div className="w-full flex justify-end mt-4">
@@ -208,7 +229,6 @@ function ChildCategorySection() {
       if (!catId) return;
       try {
         const { data } = await api.get(`/sub-category-get?categoryId=${catId}`, { withCredentials: true });
-        // API returns {subCategories: [...]}
         setSubOptions(data?.subCategories || []);
       } catch {}
     })();
@@ -224,13 +244,10 @@ function ChildCategorySection() {
     }));
   }, [dispatch, subId, page, perPage, searchValue]);
 
-  // Reset form on success; toast handled by parent
+  // Reset form on success
   useEffect(() => {
     if (successMessage?.toLowerCase().includes('child category')) {
       setName(''); setFile(null); setPreview('');
-    }
-    if (errorMessage?.toLowerCase().includes('child category')) {
-      // parent toast will show; no need to duplicate
     }
   }, [successMessage, errorMessage]);
 
@@ -258,12 +275,22 @@ function ChildCategorySection() {
   const subNameById = (id) => subOptions.find(s => s._id === id)?.name || '-';
 
   return (
-    <div className="mt-6 bg-[#283046] p-4 rounded-md">
-      <h3 className="text-[#d0d2d6] font-semibold mb-3">Child Categories</h3>
+    <div className="mt-6 relative bg-gradient-to-br from-[#2b3349] to-[#21293d] border border-slate-700/60 p-5 rounded-xl shadow-xl">
+      {/* Loader overlay */}
+      {loader ? (
+        <div className="absolute inset-0 grid place-items-center bg-[#0f1625]/40 backdrop-blur-sm rounded-xl z-10">
+          <PropagateLoader color="#3de0c2" cssOverride={overrideStyle} size={10} />
+        </div>
+      ) : null}
+
+      <div className="flex items-center gap-2 mb-4">
+        <span className="w-1.5 h-6 bg-teal-500 rounded-full" />
+        <h3 className="text-[#e6e8ee] font-semibold tracking-wide">Child Categories</h3>
+      </div>
 
       <form onSubmit={onAdd} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
         <select
-          className="px-3 py-1.5 bg-[#283046] border border-slate-700 rounded text-[#d0d2d6]"
+          className="px-3 py-1.5 bg-slate-800/60 border border-slate-700 rounded-lg text-[#d0d2d6] focus:outline-none focus:ring-2 focus:ring-teal-500/60 focus:border-teal-500/40 placeholder-slate-400"
           value={catId}
           onChange={(e)=>setCatId(e.target.value)}
         >
@@ -272,7 +299,7 @@ function ChildCategorySection() {
         </select>
 
         <select
-          className="px-3 py-1.5 bg-[#283046] border border-slate-700 rounded text-[#d0d2d6]"
+          className="px-3 py-1.5 bg-slate-800/60 border border-slate-700 rounded-lg text-[#d0d2d6] focus:outline-none focus:ring-2 focus:ring-teal-500/60 focus:border-teal-500/40 placeholder-slate-400 disabled:opacity-50"
           value={subId}
           onChange={(e)=>setSubId(e.target.value)}
           disabled={!catId}
@@ -282,64 +309,80 @@ function ChildCategorySection() {
         </select>
 
         <input
-          className="px-3 py-2 bg-[#283046] border border-slate-700 rounded text-[#d0d2d6]"
+          className="px-3 py-1.5 bg-slate-800/60 border border-slate-700 rounded-lg text-[#d0d2d6] focus:outline-none focus:ring-2 focus:ring-teal-500/60 focus:border-teal-500/40 placeholder-slate-400"
           placeholder="Child category name"
           value={name}
           onChange={(e)=>setName(e.target.value)}
         />
 
         <div className="flex items-center gap-2">
-          <label htmlFor="child-file" className="px-3 py-2 bg-slate-700 rounded cursor-pointer">Choose Image</label>
+          <label htmlFor="child-file" className="px-3 py-1.5 bg-slate-700/80 hover:bg-slate-700 text-[#e6e8ee] rounded-lg cursor-pointer transition">
+            Choose Image
+          </label>
           <input id="child-file" type="file" accept="image/*" className="hidden" onChange={onFile}/>
-          <button disabled={loader} className="px-4 py-2 bg-teal-600 text-white rounded disabled:opacity-60 cursor-pointer">
+          <button disabled={loader} className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-teal-600 to-teal-500 text-white disabled:opacity-60 hover:from-teal-500 hover:to-teal-400 transition cursor-pointer">
             {loader ? 'Saving...' : 'Add Child Category'}
           </button>
         </div>
-        {preview ? <img src={preview} alt="preview" className="h-16 rounded border md:col-span-4"/> : null}
+        {preview ? (
+          <div className="md:col-span-4">
+            <img src={preview} alt="preview" className="h-20 rounded-lg border border-slate-700 ring-1 ring-slate-700/50 shadow-md object-cover" />
+          </div>
+        ) : null}
       </form>
 
       {subId ? (
         <>
           <Search setPerPage={setPerPage} setSearchValue={setSearchValue} searchValue={searchValue} />
 
-          <div className="relative overflow-x-auto mt-3">
-            <table className="w-full text-sm text-left text-[#d0d2d6]">
-              <thead className="uppercase border-b border-slate-700">
-                <tr>
-                  <th className="py-3 px-4">No</th>
-                  <th className="py-3 px-4">Image</th>
-                  <th className="py-3 px-4">Name</th>
-                  <th className="py-3 px-4">Category</th>
-                  <th className="py-3 px-4">Sub Category</th>
-                  <th className="py-3 px-4">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {childCategories?.length ? childCategories.map((c, i) => (
-                  <tr key={c._id} className="border-b border-slate-700/60">
-                    <td className="py-2 px-4">{(page-1)*perPage + i + 1}</td>
-                    <td className="py-2 px-4">{c.image ? <img src={c.image} className="w-10 h-10 object-cover rounded border" alt="child_category_image" /> : '-'}</td>
-                    <td className="py-2 px-4">{c.name}</td>
-                    <td className="py-2 px-4">{catNameById(c.categoryId)}</td>
-                    <td className="py-2 px-4">{subNameById(c.subcategoryId)}</td>
-                    <td className="py-2 px-4">
-                      <button
-                        onClick={()=> {
-                          const ok = window.confirm('Delete this child category?');
-                          if (ok) dispatch(delete_child_category(c._id));
-                        }}
-                        className="p-[6px] bg-red-500 rounded hover:shadow-lg hover:shadow-red-500/50 cursor-pointer"
-                        title="Delete"
-                      >
-                        <MdDelete />
-                      </button>
-                    </td>
+          <div className="relative overflow-hidden mt-3 rounded-lg border border-slate-700/60">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left text-[#d0d2d6]">
+                <thead className="uppercase text-[12px] tracking-wider bg-slate-800/70 backdrop-blur border-b border-slate-700 sticky top-0 z-[1]">
+                  <tr>
+                    <th className="py-3.5 px-4">No</th>
+                    <th className="py-3.5 px-4">Image</th>
+                    <th className="py-3.5 px-4">Name</th>
+                    <th className="py-3.5 px-4">Category</th>
+                    <th className="py-3.5 px-4">Sub Category</th>
+                    <th className="py-3.5 px-4">Action</th>
                   </tr>
-                )) : (
-                  <tr><td colSpan="6" className="py-6 px-4 text-center text-slate-400">No child categories found</td></tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-700/60">
+                  {childCategories?.length ? childCategories.map((c, i) => (
+                    <tr key={c._id} className="hover:bg-slate-700/30 transition">
+                      <td className="py-2.5 px-4">{(page-1)*perPage + i + 1}</td>
+                      <td className="py-2.5 px-4">
+                        {c.image ? (
+                          <img src={c.image} className="w-10 h-10 object-cover rounded-md border border-slate-700" alt="child_category_image" />
+                        ) : '-'}
+                      </td>
+                      <td className="py-2.5 px-4">{c.name}</td>
+                      <td className="py-2.5 px-4">{catNameById(c.categoryId)}</td>
+                      <td className="py-2.5 px-4">{subNameById(c.subcategoryId)}</td>
+                      <td className="py-2.5 px-4">
+                        <button
+                          onClick={()=> {
+                            const ok = window.confirm('Delete this child category?');
+                            if (ok) dispatch(delete_child_category(c._id));
+                          }}
+                          className="p-[6px] bg-rose-500/90 hover:bg-rose-500 text-white rounded-md hover:shadow-lg hover:shadow-rose-500/30 cursor-pointer transition"
+                          title="Delete"
+                        >
+                          <MdDelete />
+                        </button>
+                      </td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan="6" className="py-10 px-4 text-center text-slate-400">
+                        No child categories found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <div className="w-full flex justify-end mt-4">
@@ -444,7 +487,6 @@ const Category = () => {
     }
     if (successMessage) {
       toast.success(successMessage);
-      // শুধুমাত্র মূল Category add/edit হলে panel বন্ধ করবো
       const m = successMessage.toLowerCase();
       const isMainCategoryOp = m.includes('category') && !m.includes('sub') && !m.includes('child');
       if (show && isMainCategoryOp) {
@@ -452,7 +494,7 @@ const Category = () => {
       }
       dispatch(messageClear());
     }
-  }, [show,errorMessage, successMessage, dispatch]); // intentionally not adding 'show'
+  }, [show,errorMessage, successMessage, dispatch]);
 
   // category fetch
   useEffect(() => {
@@ -465,78 +507,91 @@ const Category = () => {
   }, [searchValue, currentPage, perPage, dispatch]);
 
   return (
-    <div className="px-2 md:px-7 py-5">
-      <div className="w-full flex lg:hidden justify-between items-center bg-[#283046] p-3 gap-2 mb-4 rounded-md shadow">
-        <h1 className="text-lg font-semibold text-[#d0d2d6]"> Category</h1>
+    <div className="px-2 md:px-7 py-6 space-y-6">
+      {/* Top bar (mobile) */}
+      <div className="w-full flex lg:hidden justify-between items-center bg-gradient-to-br from-[#2b3349] to-[#21293d] border border-slate-700/60 p-3 gap-2 rounded-xl shadow">
+        <h1 className="text-lg font-semibold text-[#e6e8ee]">Category</h1>
         <button
           onClick={openAddPanel}
-          className="ml-auto px-4 py-1 bg-teal-600 text-white rounded hover:bg-teal-700 transition"
+          className="ml-auto px-4 py-2 rounded-lg bg-gradient-to-r from-teal-600 to-teal-500 text-white hover:from-teal-500 hover:to-teal-400 transition"
         >
           Add
         </button>
       </div>
 
-      <div className='flex flex-wrap w-full'>
-        <div className='w-full lg:w-7/12'>
-          <div className="w-full bg-[#283046] p-4 rounded-md">
+      <div className="flex flex-wrap w-full gap-y-6">
+        {/* Left: table */}
+        <div className="w-full lg:w-7/12">
+          <div className="relative w-full bg-gradient-to-br from-[#2b3349] to-[#21293d] border border-slate-700/60 p-4 rounded-xl shadow-xl">
+            {/* Loader overlay (optional for table ops) */}
+            {loader ? (
+              <div className="absolute inset-0 grid place-items-center bg-[#0f1625]/30 backdrop-blur-[1px] rounded-xl z-10">
+                <PropagateLoader color="#3de0c2" cssOverride={overrideStyle} size={8} />
+              </div>
+            ) : null}
+
             <Search setPerPage={setPerPage} setSearchValue={setSearchValue} searchValue={searchValue} />
 
-            <div className="relative overflow-x-auto">
-              <table className="w-full text-sm text-left text-[#d0d2d6]">
-                <thead className="text-sm text-[#d0d2d6] uppercase border-b border-slate-700">
-                  <tr>
-                    <th className="py-3 px-4">No</th>
-                    <th className="py-3 px-4">Image</th>
-                    <th className="py-3 px-4">Name</th>
-                    <th className="py-3 px-4">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {categories?.length > 0 ? (
-                    categories.map((d, i) => {
-                      const serial = (currentPage - 1) * perPage + i + 1;
-                      return (
-                        <tr key={d._id || i} className="border-b border-slate-700/60">
-                          <td className="py-2 px-4 font-medium whitespace-normal">{serial}</td>
-                          <td className="py-2 px-4 font-medium whitespace-normal">
-                            <img className='w-[35px] h-[45px] object-cover rounded border border-slate-700'
-                                 src={d?.image}
-                                 alt={d?.name || 'category_image'} />
-                          </td>
-                          <td className="py-2 px-4 font-medium whitespace-normal">
-                            <span>{d?.name}</span>
-                          </td>
-                          <td className="py-2 px-4 font-medium whitespace-normal">
-                            <div className='flex justify-start items-center gap-2'>
-                              <button
-                                onClick={() => openEditPanel(d)}
-                                className='p-[6px] bg-yellow-500 rounded hover:shadow-lg hover:shadow-yellow-500/50 cursor-pointer'
-                                title="Edit"
-                              >
-                                <MdEdit />
-                              </button>
-                              <button
-                                onClick={() => handleDelete(d?._id)}
-                                disabled={loader}
-                                className='p-[6px] bg-red-500 rounded hover:shadow-lg hover:shadow-red-500/50 disabled:opacity-60 cursor-pointer'
-                                title="Delete"
-                              >
-                                <MdDelete />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  ) : (
+            <div className="relative overflow-hidden mt-3 rounded-lg border border-slate-700/60">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left text-[#d0d2d6]">
+                  <thead className="text-xs uppercase tracking-wider bg-slate-800/70 backdrop-blur border-b border-slate-700 sticky top-0 z-[1]">
                     <tr>
-                      <td className="py-6 px-4 text-center text-slate-400" colSpan="4">
-                        No categories found
-                      </td>
+                      <th className="py-3.5 px-4">No</th>
+                      <th className="py-3.5 px-4">Image</th>
+                      <th className="py-3.5 px-4">Name</th>
+                      <th className="py-3.5 px-4">Action</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-slate-700/60">
+                    {categories?.length > 0 ? (
+                      categories.map((d, i) => {
+                        const serial = (currentPage - 1) * perPage + i + 1;
+                        return (
+                          <tr key={d._id || i} className="hover:bg-slate-700/30 transition">
+                            <td className="py-2.5 px-4 font-medium whitespace-normal">{serial}</td>
+                            <td className="py-2.5 px-4 font-medium whitespace-normal">
+                              <img
+                                className="w-[38px] h-[46px] object-cover rounded-md border border-slate-700 ring-1 ring-slate-700/40"
+                                src={d?.image}
+                                alt={d?.name || 'category_image'}
+                              />
+                            </td>
+                            <td className="py-2.5 px-4 font-medium whitespace-normal">
+                              <span>{d?.name}</span>
+                            </td>
+                            <td className="py-2.5 px-4 font-medium whitespace-normal">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => openEditPanel(d)}
+                                  className="p-[7px] bg-amber-500/90 hover:bg-amber-500 text-black rounded-md hover:shadow-lg hover:shadow-amber-500/30 cursor-pointer transition"
+                                  title="Edit"
+                                >
+                                  <MdEdit />
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(d?._id)}
+                                  disabled={loader}
+                                  className="p-[7px] bg-rose-500/90 hover:bg-rose-500 text-white rounded-md hover:shadow-lg hover:shadow-rose-500/30 disabled:opacity-60 cursor-pointer transition"
+                                  title="Delete"
+                                >
+                                  <MdDelete />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td className="py-12 px-4 text-center text-slate-400" colSpan="4">
+                          No categories found
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             <div className="w-full flex justify-end mt-4">
@@ -551,77 +606,84 @@ const Category = () => {
           </div>
         </div>
 
-        {/* Right Panel: Add / Edit */}
-        <div className={`w-[320px] lg:w-5/12 lg:relative lg:right-0 fixed ${show ? 'right-0' : '-right-[340px]'} z-50 top-0 transition-all duration-500`}>
-          <div className='w-full pl-5'>
-            <div className=" bg-[#283046] h-screen lg:h-auto px-3 py-2 lg:rounded-md text-[#d0d2d6]">
-              <div className='flex justify-between items-center'>
-                <h2 className='text-[#d0d2d6] font-semibold text-md mb-4 text-center'>
-                  {isEdit ? 'Edit Category' : 'Add Category'}
-                </h2>
-                <div
-                  onClick={closePanel}
-                  className='block md:hidden bg-gray-800 p-1 cursor-pointer rounded-full hover:bg-[#d0d2d6] transition-all duration-300 hover:text-black'
-                >
-                  <IoCloseSharp />
+        {/* Right Panel: Add / Edit (Slide-over) */}
+        <div className={`w-[340px] lg:w-5/12 lg:relative lg:right-0 fixed ${show ? 'right-0' : '-right-[360px]'} z-50 top-0 transition-all duration-500`}>
+          <div className="w-full lg:pl-5">
+            <div className="bg-gradient-to-b from-[#2b3349] to-[#21293d] h-screen lg:h-auto px-3 py-3 lg:rounded-xl text-[#d0d2d6] border border-slate-700/60 shadow-2xl">
+              <div className="sticky top-0 bg-transparent z-[2]">
+                <div className="flex justify-between items-center mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-6 bg-teal-500 rounded-full" />
+                    <h2 className="text-[#e6e8ee] font-semibold text-md">
+                      {isEdit ? 'Edit Category' : 'Add Category'}
+                    </h2>
+                  </div>
+                  <div
+                    onClick={closePanel}
+                    className="block md:hidden bg-slate-800/90 p-1 cursor-pointer rounded-full hover:bg-slate-200 hover:text-black transition-all duration-200"
+                    title="Close"
+                  >
+                    <IoCloseSharp />
+                  </div>
                 </div>
               </div>
 
-              <form onSubmit={onSubmit}>
-                <div className='flex flex-col w-full gap-1 mb-3'>
-                  <label htmlFor="name">Category Name</label>
+              <form onSubmit={onSubmit} className="space-y-3">
+                <div className="flex flex-col w-full gap-1">
+                  <label htmlFor="name" className="text-sm text-slate-300">Category Name</label>
                   <input
                     onChange={(e) => setState({ ...state, name: e.target.value })}
                     value={state.name}
                     required
                     type="text"
                     placeholder="Category name"
-                    id='name'
-                    name='category_name'
-                    className="px-4 py-2 focus:border-indigo-500 outline-none bg-[#283046]  border border-slate-700 rounded-md text-white"
+                    id="name"
+                    name="category_name"
+                    className="px-4 py-2 bg-slate-800/60 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/60 focus:border-teal-500/40"
                   />
                 </div>
 
                 <div>
                   <label
-                    className='flex justify-center items-center flex-col h-[238px] cursor-pointer border border-dashed hover:border-indigo-500'
+                    className="flex justify-center items-center flex-col h-[238px] cursor-pointer border border-dashed border-slate-600 hover:border-teal-500/70 rounded-lg bg-slate-900/30 transition"
                     htmlFor="image"
                   >
                     {imageShow ? (
-                      <img src={imageShow} alt="category_image" className='w-full h-full object-cover' />
+                      <img src={imageShow} alt="category_image" className="w-full h-full object-cover rounded-lg" />
                     ) : (
-                      <>
-                        <span><BsImage /></span>
-                        <span>Select Image</span>
-                      </>
+                      <div className="flex flex-col items-center text-slate-400">
+                        <span className="text-3xl mb-2"><BsImage /></span>
+                        <span>Click to select image</span>
+                        <span className="text-xs mt-1 text-slate-500">JPG, PNG or WEBP</span>
+                      </div>
                     )}
                   </label>
                 </div>
 
                 <input
                   onChange={imageHandle}
-                  className='hidden'
+                  className="hidden"
                   type="file"
                   name="image"
                   id="image"
                   accept="image/*"
-                  required={!isEdit} // edit এ ইমেজ optional
+                  required={!isEdit}
                 />
 
-                <div className="flex items-center gap-2 mt-4">
+                <div className="flex items-center gap-2 pt-1">
                   <button
                     type="button"
                     onClick={closePanel}
-                    className="w-1/3 px-4 py-2 rounded-md border border-slate-600 hover:bg-slate-700"
+                    className="w-1/3 px-4 py-2 rounded-lg border border-slate-600 bg-slate-800/50 text-slate-200 hover:bg-slate-700/60 transition cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     disabled={loader}
                     type="submit"
-                    className={`w-2/3 primaryBtn transition-all duration-200 ${loader ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
+                    className={`w-2/3 px-4 py-2 rounded-lg bg-gradient-to-r from-teal-600 to-teal-500 text-white hover:from-teal-500 hover:to-teal-400 transition cursor-pointer ${loader ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
                   >
-                    {loader ? <PropagateLoader color='white' cssOverride={overrideStyle} size={8} /> : (isEdit ? 'Save Changes' : 'Add Category')}
+                    {loader ? <PropagateLoader color="white" cssOverride={overrideStyle} size={8} /> : (isEdit ? 'Save Changes' : 'Add Category')}
                   </button>
                 </div>
               </form>
@@ -630,11 +692,11 @@ const Category = () => {
         </div>
 
         {/* Floating Add button for desktop */}
-        <div className="hidden lg:block lg:w-5/12 pl-5">
-          <div className="bg-[#283046] rounded-md p-3">
+        <div className="hidden lg:block lg:w-5/12 lg:pl-5">
+          <div className="bg-gradient-to-br from-[#2b3349] to-[#21293d] rounded-xl p-4 border border-slate-700/60 shadow">
             <button
               onClick={openAddPanel}
-              className="w-full px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 transition cursor-pointer"
+              className="w-full px-4 py-2 rounded-lg bg-gradient-to-r from-teal-600 to-teal-500 text-white hover:from-teal-500 hover:to-teal-400 transition cursor-pointer"
             >
               Add Category
             </button>
@@ -644,6 +706,12 @@ const Category = () => {
           </div>
         </div>
       </div>
+
+      {/* Dim backdrop for slide-over on small screens */}
+      <div
+        onClick={closePanel}
+        className={`fixed inset-0 bg-black/40 backdrop-blur-[1px] z-40 transition-opacity duration-300 ${show ? 'opacity-100 visible lg:invisible' : 'opacity-0 invisible'}`}
+      />
 
       {/* Sub + Child sections */}
       <SubCategorySection />

@@ -12,6 +12,8 @@ export const admin_login = createAsyncThunk(
       if (data.error) return rejectWithValue(data);
       return fulfillWithValue(data);
     } catch (error) {
+      console.log(error);
+      
       return rejectWithValue(error.response?.data || { error: 'Login failed' });
     }
   }
@@ -21,11 +23,13 @@ export const seller_register = createAsyncThunk(
   'auth/seller_register',
   async (info, { rejectWithValue, fulfillWithValue }) => {
     try {
+      console.log(info);
       const { data } = await api.post('/seller-register', info);
       localStorage.setItem('accessToken', data.token);
       if (data.error) return rejectWithValue(data);
       return fulfillWithValue(data);
     } catch (error) {
+      console.log(error);
       return rejectWithValue(error.response?.data || { error: 'Registration failed' });
     }
   }

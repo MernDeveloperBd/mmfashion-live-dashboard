@@ -36,28 +36,83 @@ const SellerDashboard = () => {
     return `${base} bg-slate-600/20 text-slate-300`;
   };
 
-  const chartState = useMemo(() => ({
-    series: [
-      { name: "Orders", data: [30, 40, 35, 50, 49, 60, 70, 91, 15, 19, 27, 68] },
-      { name: "Revenue", data: [50, 47, 35, 50, 59, 40, 10, 41, 25, 19, 27, 78] },
-      { name: "Sales", data: [15, 47, 33, 77, 45, 24, 47, 14, 14, 19, 16, 24] }
-    ],
-    options: {
-      chart: { background: 'transparent', foreColor: '#d0d2d6', toolbar: { show: false }, height: 360 },
-      colors: ['#00E396', '#FEB019', '#008FFB'],
-      dataLabels: { enabled: false },
-      stroke: { curve: 'smooth', width: 2 },
-      grid: { borderColor: '#334155' },
-      xaxis: { categories: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] },
-      legend: { position: 'top', labels: { colors: '#d0d2d6' } },
-      responsive: [
-        { breakpoint: 1280, options: { chart: { height: 340 } } },
-        { breakpoint: 1024, options: { chart: { height: 320 } } },
-        { breakpoint: 768,  options: { chart: { height: 300 } } },
-        { breakpoint: 640,  options: { chart: { height: 280 } } },
-      ]
-    }
+  // Overview chart base options
+  const MONTHS = useMemo(() => ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], []);
+  const chartBaseOptions = useMemo(() => ({
+    chart: { background: 'transparent', foreColor: '#d0d2d6', toolbar: { show: false }, height: 360 },
+    colors: ['#00E396', '#FEB019', '#008FFB'],
+    dataLabels: { enabled: false },
+    stroke: { curve: 'smooth', width: 2 },
+    grid: { borderColor: '#334155' },
+    legend: { position: 'top', labels: { colors: '#d0d2d6' } },
+    tooltip: { y: { formatter: (val) => Number(val || 0).toLocaleString() } },
+    responsive: [
+      { breakpoint: 1280, options: { chart: { height: 340 } } },
+      { breakpoint: 1024, options: { chart: { height: 320 } } },
+      { breakpoint: 768,  options: { chart: { height: 300 } } },
+      { breakpoint: 640,  options: { chart: { height: 280 } } },
+    ]
   }), []);
+
+  // createdAt না থাকলে date (string) থেকে তারিখ পার্সিং
+  const parseOrderMoment = (o) => {
+    if (o?.createdAt) {
+      const m = moment(o.createdAt);
+      if (m.isValid()) return m;
+    }
+    if (o?.date) {
+      const m = moment(o.date, [moment.ISO_8601, 'YYYY-MM-DD', 'DD-MM-YYYY', 'MM/DD/YYYY', 'YYYY/MM/DD'], true);
+      if (m.isValid()) return m;
+      const fallback = moment(o.date);
+      if (fallback.isValid()) return fallback;
+    }
+    return null;
+  };
+
+  // monthly aggregation from recentOrders + total revenue (for top card)
+  const { categories, series, revenueTotal } = useMemo(() => {
+    const categories = MONTHS;
+    const orders = Array(12).fill(0);
+    const revenue = Array(12).fill(0);
+    const sales = Array(12).fill(0);
+
+    (recentOrders || []).forEach((o) => {
+      const m = parseOrderMoment(o);
+      if (!m) return;
+
+      // শুধু চলতি বছর চাইলে আনকমেন্ট করুন:
+      // if (m.year() !== moment().year()) return;
+
+      const idx = m.month(); // 0-11
+      orders[idx] += 1;
+      revenue[idx] += Number(o?.price || 0);
+
+      // Sales = products[].quantity এর যোগফল; quantity না থাকলে প্রতি প্রোডাক্ট 1 ধরা হয়েছে
+      const qty = Array.isArray(o?.products)
+        ? o.products.reduce((sum, p) => sum + (Number(p?.quantity) || 1), 0)
+        : 0;
+      sales[idx] += qty;
+    });
+
+    const revenueTotal = Number(revenue.reduce((a, b) => a + b, 0).toFixed(2));
+
+    return {
+      categories,
+      series: [
+        { name: 'Orders', data: orders },
+        { name: 'Revenue', data: revenue.map(n => Number(n.toFixed(2))) },
+        { name: 'Sales', data: sales },
+      ],
+      revenueTotal
+    };
+  }, [recentOrders, MONTHS]);
+
+  // Top কার্ডে কী দেখাবো: backend totalSale > 0 হলে সেটাই, না হলে চার্টের revenueTotal
+  const totalSalesToShow = useMemo(() => {
+    const backend = Number(totalSale);
+    if (!Number.isNaN(backend) && backend > 0) return backend;
+    return revenueTotal;
+  }, [totalSale, revenueTotal]);
 
   useEffect(() => {
     dispatch(get_seller_dashboard_index_data());
@@ -69,7 +124,7 @@ const SellerDashboard = () => {
       <div className="w-full grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         <div className="flex justify-between items-center p-4 sm:p-5 bg-[#283046] rounded-xl ring-1 ring-slate-700/50 hover:-translate-y-[2px] transition">
           <div className="text-[#d0d2d6]">
-            <h2 className="text-xl sm:text-2xl font-bold">{fmtTk(totalSale)}</h2>
+            <h2 className="text-xl sm:text-2xl font-bold">{fmtTk(totalSalesToShow)}</h2>
             <span className="text-xs sm:text-sm">Total Sales</span>
           </div>
           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-600/20 flex justify-center items-center text-xl sm:text-2xl">
@@ -116,7 +171,13 @@ const SellerDashboard = () => {
               <h3 className="text-[#d0d2d6] font-semibold">Overview</h3>
             </div>
             <div className="w-full">
-              <Chart options={chartState.options} series={chartState.series} type="area" width="100%" height={chartState.options.chart.height} />
+              <Chart
+                options={{ ...chartBaseOptions, xaxis: { categories } }}
+                series={series}
+                type="area"
+                width="100%"
+                height={chartBaseOptions.chart.height}
+              />
             </div>
           </div>
         </div>
@@ -187,7 +248,7 @@ const SellerDashboard = () => {
                 </div>
                 <div className="mt-3">
                   <Link
-                    to={`seller/dashboard/order/details/${d?._id}`}
+                    to={`/seller/order/details/${d?._id}`}
                     className="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-xs"
                   >
                     View
@@ -226,7 +287,7 @@ const SellerDashboard = () => {
                     </td>
                     <td className="py-3 px-4">
                       <Link
-                        to={`/seller/dashboard/order/details/${d?._id}`}
+                        to={`/seller/order/details/${d?._id}`}
                         className="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-xs"
                       >
                         View

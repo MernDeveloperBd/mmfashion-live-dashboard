@@ -4,11 +4,17 @@ import api from "../../api/api";
 // Pending seller requests
 export const get_seller_dashboard_index_data = createAsyncThunk(
     'dashboardIndex/get_seller_dashboard_index_data',
-    async (_, { rejectWithValue, fulfillWithValue }) => {
+    async (_, { rejectWithValue, fulfillWithValue,getState }) => {
+         const token = getState().auth.token
+        const config = {
+            headers: {
+                'authorization': `Bearer ${token}`
+            }
+        }
         try {
             const { data } = await api.get(
                 `/seller/get-dashboard-index-data`,
-                { withCredentials: true }
+                config
             );
             return fulfillWithValue(data);
         } catch (err) {

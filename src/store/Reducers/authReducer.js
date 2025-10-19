@@ -74,7 +74,7 @@ export const logout = createAsyncThunk(
   async ({ navigate, role }, { rejectWithValue }) => {
     try {
       localStorage.removeItem('accessToken');
-      navigate(role === 'admin' ? '/admin/login' : '/login', { replace: true });
+      navigate(role === 'admin' ? '/admin-login' : '/login', { replace: true });
     } catch (error) {
       return rejectWithValue(error.response?.data || { error: 'Logout failed' });
     }

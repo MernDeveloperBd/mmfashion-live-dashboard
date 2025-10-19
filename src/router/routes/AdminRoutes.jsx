@@ -16,12 +16,12 @@ const OrderDetails = lazy(() => import('../../views/admin/OrderDetails'));
 
 const AdminRoutes = [
     {
-        path: 'admin/dashboard',
+        path: '/admin/dashboard',
         element: <AdminDashboard />,
         role: 'admin'
     },
     {
-        path: 'admin/dashboard/orders',
+        path: '/admin/dashboard/orders',
         element: <Orders />,
         role: 'admin'
     },

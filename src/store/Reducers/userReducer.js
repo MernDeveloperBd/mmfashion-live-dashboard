@@ -1,13 +1,20 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import api from '../../api/api';
+import { base_url } from '../../utils/config';
+import axios from 'axios';
 
 export const get_users = createAsyncThunk(
   'user/get_users',
-  async ({ perPage, page, searchValue }, { rejectWithValue, fulfillWithValue }) => {
+  async ({ perPage, page, searchValue }, { rejectWithValue, fulfillWithValue, getState }) => {
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.get(
-        `/get-users?page=${page}&perPage=${perPage}&searchValue=${encodeURIComponent(searchValue || '')}`,
-        { withCredentials: true }
+      const { data } = await axios.get(
+        `${base_url}/api/get-users?page=${page}&perPage=${perPage}&searchValue=${encodeURIComponent(searchValue || '')}`,
+        config
       );
       return fulfillWithValue(data);
     } catch (err) {

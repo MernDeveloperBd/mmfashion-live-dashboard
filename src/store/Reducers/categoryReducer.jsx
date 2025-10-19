@@ -3,18 +3,21 @@ import api from "../../api/api";
 
 export const categoryAdd = createAsyncThunk(
   'category/categoryAdd',
-  async ({ name, image }, { rejectWithValue }) => {
+  async ({ name, image }, { rejectWithValue, fulfillWithValue,getState }) => {
+        const token = getState().auth.token
+        const config = {
+            headers: {
+                'authorization': `Bearer ${token}`
+            }
+        }
     try {
       const formData = new FormData();
       formData.append("name", name);
       formData.append("image", image);
 
-      const { data } = await api.post('/category-add', formData, {
-        withCredentials: true
-      });
-
+      const { data } = await api.post('/category-add', formData, config);
       if (data?.error) return rejectWithValue(data);
-      return data;
+        return fulfillWithValue(data);
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
     }
@@ -22,12 +25,15 @@ export const categoryAdd = createAsyncThunk(
 );
 export const get_category = createAsyncThunk(
   'category/get_category',
-  async ({ page, searchValue, perPage }, { rejectWithValue, fulfillWithValue }) => {
+  async ({ page, searchValue, perPage }, { rejectWithValue, fulfillWithValue, getState }) => {
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'authorization': `Bearer ${token}`
+            }
+        }
     try {    
-      const { data } = await api.get(`/category-get?page=${page}&&searchValue=${searchValue}&&perPage=${perPage}`,  {
-        withCredentials: true
-      });
-      
+      const { data } = await api.get(`/category-get?page=${page}&&searchValue=${searchValue}&&perPage=${perPage}`, config);   
       
       // if (data?.error) return rejectWithValue(data);
       return fulfillWithValue(data);
@@ -39,18 +45,22 @@ export const get_category = createAsyncThunk(
 
 export const categoryUpdate = createAsyncThunk(
   'category/categoryUpdate',
-  async ({ id, name, image }, { rejectWithValue }) => {
+  async ({ id, name, image }, { fulfillWithValue,rejectWithValue, getState }) => {
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'authorization': `Bearer ${token}`
+            }
+        }
     try {
       const formData = new FormData();
       if (typeof name !== 'undefined') formData.append("name", name);
       if (image) formData.append("image", image);
 
-      const { data } = await api.put(`/category-edit/${id}`, formData, {
-        withCredentials: true
-      });
+      const { data } = await api.put(`/category-edit/${id}`, formData, config);
 
       if (data?.error) return rejectWithValue(data);
-      return data; // { category, message }
+        return fulfillWithValue(data);
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
     }
@@ -59,14 +69,18 @@ export const categoryUpdate = createAsyncThunk(
 
 export const categoryDelete = createAsyncThunk(
   'category/categoryDelete',
-  async (id, { rejectWithValue }) => {
+  async (id, { fulfillWithValue,rejectWithValue, getState }) => {
+     const token = getState().auth.token
+        const config = {
+            headers: {
+                'authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.delete(`/category-delete/${id}`, {
-        withCredentials: true
-      });
+      const { data } = await api.delete(`/category-delete/${id}`, config);
 
       if (data?.error) return rejectWithValue(data);
-      return { id, ...data }; // { id, message }
+      return fulfillWithValue({ id, ...data }); // { id, message }
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
     }
@@ -76,15 +90,21 @@ export const categoryDelete = createAsyncThunk(
 // SUB CATEGORY
 export const subCategoryAdd = createAsyncThunk(
   'category/subCategoryAdd',
-  async ({ categoryId, name, image }, { rejectWithValue }) => {
+  async ({ categoryId, name, image }, { fulfillWithValue,rejectWithValue, getState }) => {
+     const token = getState().auth.token
+        const config = {
+            headers: {
+                'authorization': `Bearer ${token}`
+            }
+        }
     try {
       const fd = new FormData();
       fd.append("categoryId", categoryId);
       fd.append("name", name);
       fd.append("image", image);
-      const { data } = await api.post('/sub-category-add', fd, { withCredentials: true });
+      const { data } = await api.post('/sub-category-add', fd, config);
       if (data?.error) return rejectWithValue(data);
-      return data; // { subCategory, message }
+        return fulfillWithValue(data); // { subCategory, message }
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
     }
@@ -93,9 +113,15 @@ export const subCategoryAdd = createAsyncThunk(
 
 export const get_sub_category = createAsyncThunk(
   'category/get_sub_category',
-  async ({ categoryId, page, perPage, searchValue }, { rejectWithValue, fulfillWithValue }) => {
+  async ({ categoryId, page, perPage, searchValue }, { rejectWithValue, fulfillWithValue, getState }) => {
+     const token = getState().auth.token
+        const config = {
+            headers: {
+                'authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.get(`/sub-category-get?categoryId=${categoryId}&&page=${page}&&perPage=${perPage}&&searchValue=${searchValue || ''}`, { withCredentials: true });
+      const { data } = await api.get(`/sub-category-get?categoryId=${categoryId}&&page=${page}&&perPage=${perPage}&&searchValue=${searchValue || ''}`, config);
       return fulfillWithValue({ ...data, categoryId });
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
@@ -105,11 +131,17 @@ export const get_sub_category = createAsyncThunk(
 
 export const delete_sub_category = createAsyncThunk(
   'category/delete_sub_category',
-  async (id, { rejectWithValue }) => {
+  async (id, {fulfillWithValue, rejectWithValue, getState}) => {
+     const token = getState().auth.token
+        const config = {
+            headers: {
+                'authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.delete(`/sub-category-delete/${id}`, { withCredentials: true });
+      const { data } = await api.delete(`/sub-category-delete/${id}`, config);
       if (data?.error) return rejectWithValue(data);
-      return data; // { id, message }
+      return fulfillWithValue(data); // { id, message }
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
     }
@@ -119,16 +151,22 @@ export const delete_sub_category = createAsyncThunk(
 // CHILD CATEGORY
 export const childCategoryAdd = createAsyncThunk(
   'category/childCategoryAdd',
-  async ({ categoryId, subcategoryId, name, image }, { rejectWithValue }) => {
+  async ({ categoryId, subcategoryId, name, image }, { fulfillWithValue,rejectWithValue, getState }) => {
+     const token = getState().auth.token
+        const config = {
+            headers: {
+                'authorization': `Bearer ${token}`
+            }
+        }
     try {
       const fd = new FormData();
       fd.append("categoryId", categoryId);
       fd.append("subcategoryId", subcategoryId);
       fd.append("name", name);
       fd.append("image", image);
-      const { data } = await api.post('/child-category-add', fd, { withCredentials: true });
+      const { data } = await api.post('/child-category-add', fd, config);
       if (data?.error) return rejectWithValue(data);
-      return data; // { childCategory, message }
+      return fulfillWithValue(data); // { childCategory, message }
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
     }
@@ -137,9 +175,15 @@ export const childCategoryAdd = createAsyncThunk(
 
 export const get_child_category = createAsyncThunk(
   'category/get_child_category',
-  async ({ subcategoryId, page, perPage, searchValue }, { rejectWithValue, fulfillWithValue }) => {
+  async ({ subcategoryId, page, perPage, searchValue }, { rejectWithValue, fulfillWithValue,getState }) => {
+     const token = getState().auth.token
+        const config = {
+            headers: {
+                'authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.get(`/child-category-get?subcategoryId=${subcategoryId}&&page=${page}&&perPage=${perPage}&&searchValue=${searchValue || ''}`, { withCredentials: true });
+      const { data } = await api.get(`/child-category-get?subcategoryId=${subcategoryId}&&page=${page}&&perPage=${perPage}&&searchValue=${searchValue || ''}`,config);
       return fulfillWithValue({ ...data, subcategoryId });
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
@@ -149,11 +193,17 @@ export const get_child_category = createAsyncThunk(
 
 export const delete_child_category = createAsyncThunk(
   'category/delete_child_category',
-  async (id, { rejectWithValue }) => {
+  async (id, {fulfillWithValue, rejectWithValue,getState }) => {
+     const token = getState().auth.token
+        const config = {
+            headers: {
+                'authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.delete(`/child-category-delete/${id}`, { withCredentials: true });
+      const { data } = await api.delete(`/child-category-delete/${id}`, config);
       if (data?.error) return rejectWithValue(data);
-      return data; // { id, message }
+      return fulfillWithValue(data); // { id, message }
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
     }

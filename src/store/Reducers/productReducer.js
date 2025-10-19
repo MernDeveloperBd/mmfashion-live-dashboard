@@ -1,19 +1,23 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import api from "../../api/api";
+import axios from "axios";
+import { base_url } from "../../utils/config";
 
 // product-add (FormData expected)
 export const add_product = createAsyncThunk(
   'product/add_product',
-  async (formData, { rejectWithValue }) => {
+  async (formData, { fulfillWithValue,rejectWithValue, getState }) => {
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     try {
       // formData should be FormData instance
-      const { data } = await api.post('/product-add', formData, {
-        withCredentials: true
-        // do NOT set Content-Type header manually
-      });
+      const { data } = await axios.post(`${base_url}/api/product-add`, formData, config);
 
       if (data?.error) return rejectWithValue(data);
-      return data;
+      return fulfillWithValue(data);
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
     }
@@ -23,13 +27,17 @@ export const add_product = createAsyncThunk(
 
 // product-update (FormData expected)
 // update_product (FormData expected)
-export const update_product = createAsyncThunk('product/update_product', async (formData, { rejectWithValue }) => {
+export const update_product = createAsyncThunk('product/update_product', async (formData, {fulfillWithValue, rejectWithValue ,getState}) => {
+    const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
   try {
-    const { data } = await api.post('/product-update', formData, {
-      withCredentials: true
-    });
+    const { data } = await axios.post(`${base_url}/api/product-update`, formData,config);
     if (data?.error) return rejectWithValue(data);
-    return data;
+    return fulfillWithValue(data);
   } catch (err) {
     return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
   }
@@ -39,16 +47,20 @@ export const update_product = createAsyncThunk('product/update_product', async (
 // products-get
 export const get_products = createAsyncThunk(
   'product/get_products',
-  async ({ page = 1, searchValue = '', perPage = 10 }, { rejectWithValue }) => {
+  async ({ page = 1, searchValue = '', perPage = 10 }, {fulfillWithValue, rejectWithValue, getState }) => {
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     
     try {
-      const { data } = await api.get(`/product-get?page=${page}&&searchValue=${encodeURIComponent(searchValue)}&&perPage=${perPage}`, {
-        withCredentials: true
-      });
+      const { data } = await axios.get(`${base_url}/api/product-get?page=${page}&&searchValue=${encodeURIComponent(searchValue)}&&perPage=${perPage}`, config);
       
 
       if (data?.error) return rejectWithValue(data);
-      return data;
+      return fulfillWithValue(data);
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
     }
@@ -57,12 +69,16 @@ export const get_products = createAsyncThunk(
 // product-get
 export const get_product = createAsyncThunk(
   'product/get_product',
-  async (productId, { fulfillWithValue, rejectWithValue }) => {
+  async (productId, { fulfillWithValue, rejectWithValue, getState }) => {
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
    
     try {
-      const { data } = await api.get(`/single-product-get/${productId}`, {
-        withCredentials: true
-      });
+      const { data } = await axios.get(`${base_url}/api/single-product-get/${productId}`, config);
       
 
       if (data?.error) return rejectWithValue(data);
@@ -76,11 +92,17 @@ export const get_product = createAsyncThunk(
 // delete thunk
 export const delete_product = createAsyncThunk(
   'product/delete_product',
-  async (id, { rejectWithValue }) => {
+  async (id, {fulfillWithValue, rejectWithValue, getState }) => {
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.delete(`/product-delete/${id}`, { withCredentials: true });
+      const { data } = await axios.delete(`${base_url}/api/product-delete/${id}`, config);
       if (data?.error) return rejectWithValue(data);
-      return data;
+      return fulfillWithValue(data);
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
     }
@@ -90,14 +112,19 @@ export const delete_product = createAsyncThunk(
 
 export const get_all_products = createAsyncThunk(
   'product/get_all_products',
-  async ({ page = 1, searchValue = '', perPage = 10, discount = false }, { rejectWithValue }) => {  // ✅ discount param
+  async ({ page = 1, searchValue = '', perPage = 10, discount = false }, { fulfillWithValue,rejectWithValue, getState }) => { 
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        } // ✅ discount param
     try {
-      const { data } = await api.get(
-        `/product-get-all?page=${page}&perPage=${perPage}&searchValue=${encodeURIComponent(searchValue)}&discount=${discount}`,  // ✅ Add discount=true
-        { withCredentials: true }
+      const { data } = await axios.get(
+        `${base_url}/api/product-get-all?page=${page}&perPage=${perPage}&searchValue=${encodeURIComponent(searchValue)}&discount=${discount}`, config
       );
       if (data?.error) return rejectWithValue(data);
-      return data;
+      return fulfillWithValue(data);
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message });
     }

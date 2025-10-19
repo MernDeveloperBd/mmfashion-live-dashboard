@@ -1,14 +1,20 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import api from "../../api/api";
+import { base_url } from "../../utils/config";
+import axios from "axios";
 
 // Pending seller requests
 export const get_seller_request = createAsyncThunk(
   'seller/get_seller_request',
-  async ({ page, searchValue, perPage }, { rejectWithValue, fulfillWithValue }) => {
+  async ({ page, searchValue, perPage }, { rejectWithValue, fulfillWithValue,getState }) => {
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.get(
-        `/request-seller-get?page=${page}&searchValue=${encodeURIComponent(searchValue || '')}&perPage=${perPage}`,
-        { withCredentials: true }
+      const { data } = await axios.get(
+        `${base_url}/api/request-seller-get?page=${page}&searchValue=${encodeURIComponent(searchValue || '')}&perPage=${perPage}`,config
       );
       return fulfillWithValue(data);
     } catch (err) {
@@ -20,9 +26,15 @@ export const get_seller_request = createAsyncThunk(
 // Single seller
 export const get_seller = createAsyncThunk(
   'seller/get_seller',
-  async (sellerId, { rejectWithValue, fulfillWithValue }) => {
+  async (sellerId, { rejectWithValue, fulfillWithValue,getState }) => {
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.get(`/get-seller/${sellerId}`, { withCredentials: true });
+      const { data } = await axios.get(`${base_url}/api/get-seller/${sellerId}`, config);
       return fulfillWithValue(data);
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
@@ -33,9 +45,15 @@ export const get_seller = createAsyncThunk(
 // Update status
 export const seller_status_update = createAsyncThunk(
   'seller/seller_status_update',
-  async (info, { rejectWithValue, fulfillWithValue }) => {
+  async (info, { rejectWithValue, fulfillWithValue , getState}) => {
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.post(`/seller-status-update`, info, { withCredentials: true });
+      const { data } = await axios.post(`${base_url}/api/seller-status-update`, info,config);
       return fulfillWithValue(data);
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
@@ -46,11 +64,17 @@ export const seller_status_update = createAsyncThunk(
 // Active sellers (protected; using cookie)
 export const get_active_sellers = createAsyncThunk(
   'seller/get_active_sellers',
-  async ({ perPage, page, searchValue }, { rejectWithValue, fulfillWithValue }) => {
+  async ({ perPage, page, searchValue }, { rejectWithValue, fulfillWithValue,getState }) => {
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.get(
-        `/get-sellers?page=${page}&searchValue=${encodeURIComponent(searchValue || '')}&perPage=${perPage}`,
-        { withCredentials: true }
+      const { data } = await axios.get(
+        `${base_url}/api/get-sellers?page=${page}&searchValue=${encodeURIComponent(searchValue || '')}&perPage=${perPage}`,
+        config
       );
       return fulfillWithValue(data);
     } catch (error) {
@@ -62,11 +86,16 @@ export const get_active_sellers = createAsyncThunk(
 // Deactive sellers (protected; using cookie)
 export const get_deactive_sellers = createAsyncThunk(
   'seller/get_deactive_sellers',
-  async ({ perPage, page, searchValue }, { rejectWithValue, fulfillWithValue }) => {
+  async ({ perPage, page, searchValue }, { rejectWithValue, fulfillWithValue, getState }) => {
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.get(
-        `/get-deactive-sellers?page=${page}&searchValue=${encodeURIComponent(searchValue || '')}&perPage=${perPage}`,
-        { withCredentials: true }
+      const { data } = await axios.get(
+        `${base_url}/api/get-deactive-sellers?page=${page}&searchValue=${encodeURIComponent(searchValue || '')}&perPage=${perPage}`,config
       );
       return fulfillWithValue(data);
     } catch (error) {
@@ -78,9 +107,15 @@ export const get_deactive_sellers = createAsyncThunk(
 // create stripe connect account
 export const create_stripe_connect_account = createAsyncThunk(
   'seller/create_stripe_connect_account',
-  async (_, { rejectWithValue, fulfillWithValue }) => {
+  async (_, { rejectWithValue, fulfillWithValue, getState }) => {
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.get('/payment/create-stripe-connect-account', { withCredentials: true });
+      const { data } = await axios.get(`${base_url}/api/payment/create-stripe-connect-account`, config);
       // data.url এ রিডাইরেক্ট করুন
       window.location.href = data.url;
       return fulfillWithValue(data);
@@ -92,11 +127,15 @@ export const create_stripe_connect_account = createAsyncThunk(
 // create stripe connect account
 export const active_stripe_connect_account = createAsyncThunk(
   'seller/active_stripe_connect_account',
-  async (activeCode, { rejectWithValue, fulfillWithValue }) => {
+  async (activeCode, { rejectWithValue, fulfillWithValue, getState }) => {
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.put(`/payment/active-stripe-connect-account/${activeCode}`, {}, {
-        withCredentials: true
-      })
+      const { data } = await axios.put(`${base_url}/api/payment/active-stripe-connect-account/${activeCode}`, {}, config)
       return fulfillWithValue(data)
     } catch (error) {
       return rejectWithValue(error.response.data)

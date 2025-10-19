@@ -1,16 +1,20 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../api/api';
+import axios from 'axios';
+import { base_url } from '../../utils/config';
 
 // NB: api instance যদি baseURL = '/api' হয়, তাহলে সব পাথ '/chat/...' রাখুন, '/api/chat/...' নয়।
 
 export const get_seller_payemt_details = createAsyncThunk(
   'payment/get_seller_payemt_details',
-  async (sellerId, { rejectWithValue, fulfillWithValue }) => {
+  async (sellerId, { rejectWithValue, fulfillWithValue,getState }) => {
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.get(
-        `/payment/seller-payment-details/${sellerId}`,
-        { withCredentials: true } // important
-      );
+      const { data } = await axios.get(`${base_url}/api/payment/seller-payment-details/${sellerId}`, config );
       return fulfillWithValue(data);
     } catch (error) {
       return rejectWithValue(error.response?.data || { error: 'Network error' });
@@ -27,7 +31,7 @@ export const send_withdrowal_request = createAsyncThunk(
             }
         }
         try {
-            const { data } = await api.post(`/payment/withdrowal-request`, info, config)
+            const { data } = await axios.post(`${base_url}/api/payment/withdrowal-request`, info, config)
             return fulfillWithValue(data)
         } catch (error) {
             return rejectWithValue(error.response.data)
@@ -45,7 +49,7 @@ export const get_payment_request = createAsyncThunk(
             }
         }
         try {
-            const { data } = await api.get(`payment/request`, config)
+            const { data } = await axios.get(`${base_url}/api/payment/request`, config)
             return fulfillWithValue(data)
         } catch (error) {
             return rejectWithValue(error.response.data)
@@ -63,7 +67,7 @@ export const confirm_payment_request = createAsyncThunk(
             }
         }
         try {
-            const { data } = await api.post(`/payment/request-confirm`, { paymentId }, config)
+            const { data } = await axios.post(`${base_url}/api/payment/request-confirm`, { paymentId }, config)
             return fulfillWithValue(data)
         } catch (error) {
             return rejectWithValue(error.response.data)

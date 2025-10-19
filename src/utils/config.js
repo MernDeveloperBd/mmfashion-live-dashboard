@@ -1,7 +1,7 @@
 
 
 const local = 'http://localhost:5000'
-const production = 'https://mmfashion-live-server.onrender.com'
+const production = import.meta.env.VITE_BACKEND_URL
 
 let base_url = ''
 let mode = 'pro'

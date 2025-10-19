@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import api from "../../api/api";
+import axios from "axios";
+import { base_url } from "../../utils/config";
 
 // Pending seller requests
 export const get_seller_dashboard_index_data = createAsyncThunk(
@@ -12,9 +13,8 @@ export const get_seller_dashboard_index_data = createAsyncThunk(
             }
         }
         try {
-            const { data } = await api.get(
-                `/seller/get-dashboard-index-data`,
-                config
+            const { data } = await axios.get(
+                `${base_url}/api/seller/get-dashboard-index-data`, config
             );
             return fulfillWithValue(data);
         } catch (err) {
@@ -33,7 +33,7 @@ export const get_admin_dashboard_index_data = createAsyncThunk(
             }
         }
         try {
-            const { data } = await api.get(`/admin/get-dashboard-index-data`, config)
+            const { data } = await axios.get(`${base_url}/api/admin/get-dashboard-index-data`, config)
             return fulfillWithValue(data)
         } catch (error) {
             return rejectWithValue(error.response.data)

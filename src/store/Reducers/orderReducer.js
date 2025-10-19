@@ -1,15 +1,22 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../api/api";
+import axios from "axios";
+import { base_url } from "../../utils/config";
 
 // Pending seller requests
 export const get_admin_orders = createAsyncThunk(
   'order/get_admin_orders',
-  async ({ page, searchValue, perPage } = {}, { rejectWithValue, fulfillWithValue }) => {
+  async ({ page, searchValue, perPage } = {}, { rejectWithValue, fulfillWithValue, getState }) => {
+      const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.get(
-        `/admin/orders?page=${page || 1}&perPage=${perPage || 10}&searchValue=${encodeURIComponent(searchValue || '')}`,
-        { withCredentials: true }
-      );
+      const { data } = await axios.get(
+        `${base_url}/api/admin/orders?page=${page || 1}&perPage=${perPage || 10}&searchValue=${encodeURIComponent(searchValue || '')}`,
+       config );
       return fulfillWithValue(data);
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
@@ -18,11 +25,17 @@ export const get_admin_orders = createAsyncThunk(
 );
 export const get_seller_orders = createAsyncThunk(
   'order/get_seller_orders',
-  async ({ perPage, page, searchValue, sellerId } = {}, { rejectWithValue, fulfillWithValue }) => {
+  async ({ perPage, page, searchValue, sellerId } = {}, { rejectWithValue, fulfillWithValue, getState }) => {
+    const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.get(
-        `/seller/orders/${sellerId}?page=${page}&searchValue=${searchValue}&perPage=${perPage}`,
-        { withCredentials: true }
+      const { data } = await axios.get(
+        `${base_url}/api/seller/orders/${sellerId}?page=${page}&searchValue=${searchValue}&perPage=${perPage}`,
+       config
       );
       return fulfillWithValue(data);
     } catch (err) {
@@ -34,9 +47,15 @@ export const get_seller_orders = createAsyncThunk(
 // Single
 export const get_admin_order = createAsyncThunk(
   'order/get_admin_order',
-  async (orderId, { rejectWithValue, fulfillWithValue }) => {
+  async (orderId, { rejectWithValue, fulfillWithValue, getState }) => {
+    const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.get(`/admin/order/details/${orderId}`, { withCredentials: true });
+      const { data } = await axios.get(`${base_url}/api/admin/order/details/${orderId}`, config);
       return fulfillWithValue(data);
     } catch (error) {
       return rejectWithValue(error.response?.data || { error: error.message || 'Network error' });
@@ -46,7 +65,6 @@ export const get_admin_order = createAsyncThunk(
 export const get_seller_order = createAsyncThunk(
     'order/get_seller_order',
     async (orderId, { rejectWithValue, fulfillWithValue, getState }) => {
-
         const token = getState().auth.token
         const config = {
             headers: {
@@ -54,7 +72,7 @@ export const get_seller_order = createAsyncThunk(
             }
         }
         try {
-            const { data } = await api.get(`/seller/order/details/${orderId}`, config)
+            const { data } = await axios.get(`${base_url}/api/seller/order/details/${orderId}`, config)
             return fulfillWithValue(data)
         } catch (error) {
             return rejectWithValue(error.response.data)
@@ -73,7 +91,7 @@ export const admin_order_status_update = createAsyncThunk(
         }
 
         try {
-            const { data } = await api.put(`/admin/order-status/update/${orderId}`, info, config)
+            const { data } = await axios.put(`${base_url}/api/admin/order-status/update/${orderId}`, info, config)
             return fulfillWithValue(data)
         } catch (error) {
             return rejectWithValue(error.response.data)
@@ -93,7 +111,7 @@ export const seller_order_status_update = createAsyncThunk(
         }
 
         try {
-            const { data } = await api.put(`/seller/order-status/update/${orderId}`, info, config)
+            const { data } = await axios.put(`${base_url}/api/seller/order-status/update/${orderId}`, info, config)
             return fulfillWithValue(data)
         } catch (error) {
             return rejectWithValue(error.response.data)
@@ -107,7 +125,7 @@ export const get_bkash_by_order = createAsyncThunk(
     try {
       const token = getState().auth.token;
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      const { data } = await api.get(`/payment/bkash/by-order/${orderId}`, config);
+      const { data } = await axios.get(`${base_url}/api/payment/bkash/by-order/${orderId}`, config);
       return fulfillWithValue(data);
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: 'Network error' });
@@ -121,7 +139,7 @@ export const approve_bkash_payment = createAsyncThunk(
     try {
       const token = getState().auth.token;
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      const { data } = await api.post(`/payment/bkash/approve`, { paymentId, note }, config);
+      const { data } = await axios.post(`${base_url}/api/payment/bkash/approve`, { paymentId, note }, config);
       return fulfillWithValue({ ...data, paymentId, orderId });
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: 'Network error' });
@@ -135,7 +153,7 @@ export const reject_bkash_payment = createAsyncThunk(
     try {
       const token = getState().auth.token;
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      const { data } = await api.post(`/payment/bkash/reject`, { paymentId, reason }, config);
+      const { data } = await axios.post(`${base_url}/api/payment/bkash/reject`, { paymentId, reason }, config);
       return fulfillWithValue({ ...data, paymentId });
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: 'Network error' });
@@ -149,7 +167,7 @@ export const get_bkash_config = createAsyncThunk(
     try {
       const token = getState().auth.token;
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      const { data } = await api.get(`/payment/bkash/config`, config);
+      const { data } = await axios.get(`${base_url}/api/payment/bkash/config`, config);
       return fulfillWithValue(data);
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: 'Failed to load bKash config' });
@@ -164,7 +182,7 @@ export const submit_bkash_payment = createAsyncThunk(
     try {
       const token = getState().auth.token;
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      const { data } = await api.post(`/payment/bkash/submit`, { orderId, amount, senderNumber, trxId }, config);
+      const { data } = await api.post(`${base_url}/api/payment/bkash/submit`, { orderId, amount, senderNumber, trxId }, config);
       return fulfillWithValue(data);
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: 'Submit failed' });

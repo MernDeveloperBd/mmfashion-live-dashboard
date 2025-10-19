@@ -5,9 +5,15 @@ import api from '../../api/api';
 
 export const get_customers = createAsyncThunk(
   'chat/get_customers',
-  async (sellerId, { rejectWithValue, fulfillWithValue }) => {
+  async (sellerId, { rejectWithValue, fulfillWithValue,getState }) => {
+       const token = getState().auth.token
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     try {
-      const { data } = await api.get(`/chat/seller/get-customers/${sellerId}`);
+      const { data } = await api.get(`/chat/seller/get-customers/${sellerId}`,config);
       return fulfillWithValue(data);
     } catch (error) {
       return rejectWithValue(error.response?.data || { error: 'Network error' });

@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import api from "../../api/api";
+import axios from "axios";
+import { base_url } from "../../utils/config";
 
 export const categoryAdd = createAsyncThunk(
   'category/categoryAdd',
@@ -15,7 +16,7 @@ export const categoryAdd = createAsyncThunk(
       formData.append("name", name);
       formData.append("image", image);
 
-      const { data } = await api.post('/category-add', formData, config);
+      const { data } = await axios.post(`${base_url}/api/category-add`, formData, config);
       if (data?.error) return rejectWithValue(data);
         return fulfillWithValue(data);
     } catch (err) {
@@ -33,7 +34,7 @@ export const get_category = createAsyncThunk(
             }
         }
     try {    
-      const { data } = await api.get(`/category-get?page=${page}&&searchValue=${searchValue}&&perPage=${perPage}`, config);   
+      const { data } = await axios.get(`${base_url}/api/category-get?page=${page}&&searchValue=${searchValue}&&perPage=${perPage}`, config);   
       
       // if (data?.error) return rejectWithValue(data);
       return fulfillWithValue(data);
@@ -57,7 +58,7 @@ export const categoryUpdate = createAsyncThunk(
       if (typeof name !== 'undefined') formData.append("name", name);
       if (image) formData.append("image", image);
 
-      const { data } = await api.put(`/category-edit/${id}`, formData, config);
+      const { data } = await axios.put(`${base_url}/api/category-edit/${id}`, formData, config);
 
       if (data?.error) return rejectWithValue(data);
         return fulfillWithValue(data);
@@ -77,7 +78,7 @@ export const categoryDelete = createAsyncThunk(
             }
         }
     try {
-      const { data } = await api.delete(`/category-delete/${id}`, config);
+      const { data } = await axios.delete(`${base_url}/api/category-delete/${id}`, config);
 
       if (data?.error) return rejectWithValue(data);
       return fulfillWithValue({ id, ...data }); // { id, message }
@@ -102,7 +103,7 @@ export const subCategoryAdd = createAsyncThunk(
       fd.append("categoryId", categoryId);
       fd.append("name", name);
       fd.append("image", image);
-      const { data } = await api.post('/sub-category-add', fd, config);
+      const { data } = await axios.post(`${base_url}/api/sub-category-add`, fd, config);
       if (data?.error) return rejectWithValue(data);
         return fulfillWithValue(data); // { subCategory, message }
     } catch (err) {
@@ -121,7 +122,7 @@ export const get_sub_category = createAsyncThunk(
             }
         }
     try {
-      const { data } = await api.get(`/sub-category-get?categoryId=${categoryId}&&page=${page}&&perPage=${perPage}&&searchValue=${searchValue || ''}`, config);
+      const { data } = await axios.get(`${base_url}/api/sub-category-get?categoryId=${categoryId}&&page=${page}&&perPage=${perPage}&&searchValue=${searchValue || ''}`, config);
       return fulfillWithValue({ ...data, categoryId });
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
@@ -139,7 +140,7 @@ export const delete_sub_category = createAsyncThunk(
             }
         }
     try {
-      const { data } = await api.delete(`/sub-category-delete/${id}`, config);
+      const { data } = await axios.delete(`${base_url}/api/sub-category-delete/${id}`, config);
       if (data?.error) return rejectWithValue(data);
       return fulfillWithValue(data); // { id, message }
     } catch (err) {
@@ -164,7 +165,7 @@ export const childCategoryAdd = createAsyncThunk(
       fd.append("subcategoryId", subcategoryId);
       fd.append("name", name);
       fd.append("image", image);
-      const { data } = await api.post('/child-category-add', fd, config);
+      const { data } = await axios.post(`${base_url}/api/child-category-add`, fd, config);
       if (data?.error) return rejectWithValue(data);
       return fulfillWithValue(data); // { childCategory, message }
     } catch (err) {
@@ -183,7 +184,7 @@ export const get_child_category = createAsyncThunk(
             }
         }
     try {
-      const { data } = await api.get(`/child-category-get?subcategoryId=${subcategoryId}&&page=${page}&&perPage=${perPage}&&searchValue=${searchValue || ''}`,config);
+      const { data } = await axios.get(`${base_url}/api/child-category-get?subcategoryId=${subcategoryId}&&page=${page}&&perPage=${perPage}&&searchValue=${searchValue || ''}`,config);
       return fulfillWithValue({ ...data, subcategoryId });
     } catch (err) {
       return rejectWithValue(err.response?.data || { error: err.message || 'Network error' });
@@ -201,7 +202,7 @@ export const delete_child_category = createAsyncThunk(
             }
         }
     try {
-      const { data } = await api.delete(`/child-category-delete/${id}`, config);
+      const { data } = await axios.delete(`${base_url}/api/child-category-delete/${id}`, config);
       if (data?.error) return rejectWithValue(data);
       return fulfillWithValue(data); // { id, message }
     } catch (err) {

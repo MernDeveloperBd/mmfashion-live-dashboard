@@ -2,5 +2,15 @@
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ],
-  "distDir": "build"
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    }
+  ]
 }

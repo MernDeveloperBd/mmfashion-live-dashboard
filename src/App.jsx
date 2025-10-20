@@ -1,14 +1,15 @@
 // src/App.js
-import { useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import Routers from "./router/Routers";
 import publicRoutes from "./router/routes/publicRoutes";
-import getRoutes from "./router/routes/index"; 
+import { getRoutes } from "./router/routes/index"; 
 import { useDispatch, useSelector } from "react-redux";
 import { get_user_info } from "./store/Reducers/authReducer";
 
 export default function App() {
-  const { token, userLoaded } = useSelector(state => state.auth);
+  const { token, userInfo, userLoaded } = useSelector(state => state.auth);
   const dispatch = useDispatch();
+  const [allRoutes, setAllRoutes] = useState([...publicRoutes]);
 
   useEffect(() => {
     if (token && !userLoaded) {
@@ -16,12 +17,13 @@ export default function App() {
     }
   }, [dispatch, token, userLoaded]);
 
-  // প্রথম রেন্ডারেই সব রুট রেজিস্টার
-  const allRoutes = useMemo(() => {
-    const privateTree = getRoutes(); // MainLayout + seller/admin nested children
-    return [...publicRoutes, privateTree];
-  }, []);
+  useEffect(() => {
+    // private routes সবসময় define করাই ভালো; তবে আপনি আগের মতোই রাখতে চাইলে রাখুন
+    const privateRoute = getRoutes(); // এখানে role পাস করার দরকার নেই
+    setAllRoutes([...publicRoutes, privateRoute]);
+  }, [userInfo]); // চাইলে dependency [] দিলেও হবে, কারণ Guard নিজেই access কন্ট্রোল করছে
 
+  // token আছে কিন্তু userLoaded false ⇒ Router render বন্ধ রাখুন
   if (token && !userLoaded) {
     return (
       <div className="w-full h-[60vh] flex items-center justify-center">

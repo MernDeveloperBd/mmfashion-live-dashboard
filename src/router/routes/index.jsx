@@ -1,8 +1,8 @@
 // src/router/routes/index.js
 import { lazy } from "react";
-import RequireAuth from "../RequireAuth";
 import AdminRoutes from "./AdminRoutes";
 import SellerRoutes from "./SellerRoutes";
+import RequireAuth from "./RequireAuth";
 
 const MainLayout = lazy(() => import('../../layout/Mainlayout'));
 

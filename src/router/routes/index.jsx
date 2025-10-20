@@ -1,22 +1,24 @@
-// src/router/routes/index.js
 import { lazy } from "react";
+import RequireAuth from "./RequireAuth";
 import AdminRoutes from "./AdminRoutes";
 import SellerRoutes from "./SellerRoutes";
-import RequireAuth from "./RequireAuth";
 
 const MainLayout = lazy(() => import('../../layout/Mainlayout'));
 
-// '/seller/products' → group='seller', child='products'
+// সব প্রাইভেট রুট একত্রে
+const PrivateRoutes = [...AdminRoutes, ...SellerRoutes];
+
+// '/seller/products' → group: 'seller', child: 'products'
 const splitToGroup = (path = "") => {
   const full = path.replace(/^\/+/, ""); // leading slash কাটুন
   const [group, ...rest] = full.split("/");
-  return { group, child: rest.join("/") }; // child '' হলে index route
+  return { group, child: rest.join("/") }; // child হতে পারে '' (index)
 };
 
 export const getRoutes = () => {
-  const groups = {}; // { seller: [], admin: [] }
+  const groups = {}; // { seller: [], admin: [], ... }
 
-  [...AdminRoutes, ...SellerRoutes].forEach((r) => {
+  PrivateRoutes.forEach((r) => {
     const { group, child } = splitToGroup(r.path);
     const role = r.role || r.ability;
     const status = r.status;
@@ -24,7 +26,8 @@ export const getRoutes = () => {
 
     const wrapped = {
       ...r,
-      path: child || undefined,              // relative child path
+      // child path relative রাখুন
+      path: child || undefined,
       index: !child || child.length === 0 ? true : undefined,
       element: (
         <RequireAuth role={role} status={status} visibility={visibility}>
@@ -37,15 +40,17 @@ export const getRoutes = () => {
     groups[group].push(wrapped);
   });
 
+  // group -> children বানান
   const children = Object.entries(groups).map(([group, routes]) => ({
     path: group,  // 'seller' বা 'admin'
     children: routes,
   }));
 
+  // চূড়ান্ত ট্রি: MainLayout parent + সব প্রাইভেট child (nested)
   return {
     path: "/",
     element: <MainLayout />,
-    children, // এখন /seller/... এবং /admin/... সব এখানে nested
+    children,
   };
 };
 

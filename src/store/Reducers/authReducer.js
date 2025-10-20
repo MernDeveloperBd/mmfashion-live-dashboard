@@ -290,7 +290,7 @@ export const authReducer = createSlice({
           ...(state.userInfo || {}),
           ...incoming,
           shopInfo: {
-            ...((state.userInfo && state.userInfo.shopInfo) || {}),
+            ...((state?.userInfo && state?.userInfo?.shopInfo) || {}),
             ...(incoming.shopInfo || {})
           }
         };

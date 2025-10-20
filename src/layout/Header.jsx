@@ -1,20 +1,20 @@
 import { FaList } from "react-icons/fa6";
 import { IoNotificationsOutline } from "react-icons/io5";
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-// import { socket } from '../../utils/utils';
-import { socket } from '../../src/utils/utils'
-// import { addNotification, markAsReadByConversation } from '../../store/Reducers/chatReducer';
-import { addNotification, markAsReadByConversation } from '../../src/store/Reducers/chatReducer';
+// সঠিক রিলেটিভ ইমপোর্ট ব্যবহার করুন (../../src/... ব্যবহার করবেন না)
+import { socket } from '../utils/utils';
+import { addNotification, markAsReadByConversation } from '../store/Reducers/chatReducer';
 
-const Header = ({shoeSidebar, setShowSidebar}) => {
+const Header = ({ shoeSidebar, setShowSidebar }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
   const { userInfo } = useSelector(state => state.auth);
-  const notifications = useSelector(state => state.chat.messageNotification);
+  // notifications null হলে [] নেব
+  const notifications = useSelector(state => state.chat.messageNotification) || [];
 
   const [openNoti, setOpenNoti] = useState(false);
 
@@ -23,58 +23,53 @@ const Header = ({shoeSidebar, setShowSidebar}) => {
     [notifications]
   );
 
-  // Small helper
   const timeAgo = (ts) => {
     const t = ts ? new Date(ts).getTime() : Date.now();
-    const diff = Math.floor((Date.now() - t)/1000);
+    const diff = Math.floor((Date.now() - t) / 1000);
     if (diff < 60) return 'Just now';
-    if (diff < 3600) return `${Math.floor(diff/60)}m`;
-    if (diff < 86400) return `${Math.floor(diff/3600)}h`;
-    if (diff < 7*86400) return `${Math.floor(diff/86400)}d`;
+    if (diff < 3600) return `${Math.floor(diff / 60)}m`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
+    if (diff < 7 * 86400) return `${Math.floor(diff / 86400)}d`;
     return new Date(t).toLocaleDateString();
   };
 
-  // are we currently in a chat with this customer?
+  // বর্তমান রাউট কাস্টমার চ্যাট কি না
   const isOnCustomerChat = useCallback((customerId) => {
-    // If your route is different, adjust the includes/regex accordingly
-    return location.pathname.includes('/seller/dashboard/chat-customer/') &&
-           location.pathname.endsWith(`/${customerId}`);
+    return location.pathname.startsWith('/seller/dashboard/chat-customer/')
+      && location.pathname.endsWith(`/${customerId}`);
   }, [location.pathname]);
 
-  // are we on admin/support chat?
+  // বর্তমান রাউট অ্যাডমিন/সাপোর্ট চ্যাট কি না (তোমার রাউট: /seller/dashboard/chat-support)
   const isOnAdminChat = useMemo(() => {
-    return location.pathname.includes('/seller/dashboard/chat-admin') ||
-           location.pathname.includes('/seller/dashboard/support');
+    return location.pathname.includes('/seller/dashboard/chat-support');
   }, [location.pathname]);
 
-  // Global socket listeners for incoming messages -> push to notifications
+  // ইনকামিং মেসেজ লিসেনার
   useEffect(() => {
     if (!socket) return;
 
     const onCustomerMessage = (msg) => {
-      if (isOnCustomerChat(msg.senderId)) return;
-
+      if (isOnCustomerChat(msg?.senderId)) return;
       dispatch(addNotification({
-        _id: msg._id,
+        _id: msg?._id,
         type: 'customer',
-        senderId: msg.senderId,
-        name: msg.senderName || 'Customer',
-        message: msg.message,
-        createdAt: msg.createdAt
+        senderId: msg?.senderId,
+        name: msg?.senderName || 'Customer',
+        message: msg?.message,
+        createdAt: msg?.createdAt
       }));
     };
 
     const onAdminMessage = (msg) => {
-      // msg: {_id, senderId, senderName, receverId, message, createdAt}
+      // সাপোর্ট চ্যাটে থাকলে নোটিফিকেশন না
       if (isOnAdminChat) return;
-
       dispatch(addNotification({
-        _id: msg._id,
+        _id: msg?._id,
         type: 'admin',
-        senderId: 'admin', // fixed conv key for admin inbox
-        name: msg.senderName || 'Support',
-        message: msg.message,
-        createdAt: msg.createdAt
+        senderId: 'admin',
+        name: msg?.senderName || 'Support',
+        message: msg?.message,
+        createdAt: msg?.createdAt
       }));
     };
 
@@ -87,20 +82,18 @@ const Header = ({shoeSidebar, setShowSidebar}) => {
     };
   }, [dispatch, isOnCustomerChat, isOnAdminChat]);
 
-  // click on a notification item
   const goToConversation = (n) => {
     if (n.type === 'customer') {
       navigate(`/seller/dashboard/chat-customer/${n.senderId}`);
       dispatch(markAsReadByConversation({ type: 'customer', senderId: n.senderId }));
     } else if (n.type === 'admin') {
-      // Replace the route below with your actual Seller->Admin chat route
       navigate(`/seller/dashboard/chat-support`);
       dispatch(markAsReadByConversation({ type: 'admin', senderId: 'admin' }));
     }
     setOpenNoti(false);
   };
 
-  // close dropdown on outside click
+  // বাইরে ক্লিক করলে ড্রপডাউন বন্ধ
   useEffect(() => {
     const handler = (e) => {
       if (!e.target.closest('#header-noti-root')) {
@@ -111,11 +104,17 @@ const Header = ({shoeSidebar, setShowSidebar}) => {
     return () => document.removeEventListener('click', handler);
   }, []);
 
+  // প্রোফাইল নাম + ইমেজ fallback
+  const displayName = userInfo?.name || userInfo?.shop?.name || '';
+  const profileImage = userInfo?.image
+    || userInfo?.shop?.image
+    || "https://res.cloudinary.com/dpd5xwjqp/image/upload/v1757668954/Misam_Marifa_Fashion_World_oo94yx.png";
+
   return (
     <div className="fixed top-0 left-0 w-full py-1 px-2 lg:px-7 z-40">
       <div className="ml0 lg:ml-[260px] rounded-md h-[65px] flex justify-between items-center bg-[#283046] text-[#d0d2d6] px-5 transition-all">
-        <div onClick={()=>setShowSidebar(!shoeSidebar)} className="w-[35px] flex lg:hidden h-[35px] rounded-sm bg-indigo-500 shadow-lg hover:shadow-indigo-500/50 justify-center items-center cursor-pointer">
-          <span><FaList/></span>
+        <div onClick={() => setShowSidebar(!shoeSidebar)} className="w-[35px] flex lg:hidden h-[35px] rounded-sm bg-indigo-500 shadow-lg hover:shadow-indigo-500/50 justify-center items-center cursor-pointer">
+          <span><FaList /></span>
         </div>
 
         <div className="hidden md:block">
@@ -123,7 +122,7 @@ const Header = ({shoeSidebar, setShowSidebar}) => {
         </div>
 
         <div id="header-noti-root" className="flex justify-center items-center gap-6 relative">
-          {/* Notification bell */}
+          {/* Notification */}
           <div className="relative">
             <button
               onClick={() => setOpenNoti(v => !v)}
@@ -138,7 +137,6 @@ const Header = ({shoeSidebar, setShowSidebar}) => {
               </span>
             )}
 
-            {/* Dropdown */}
             {openNoti && (
               <div className="absolute right-0 mt-2 w-[320px] max-h-[380px] overflow-y-auto bg-[#252b3b] border border-slate-700 rounded-md shadow-xl">
                 <div className="px-3 py-2 border-b border-slate-700 flex items-center justify-between">
@@ -186,14 +184,17 @@ const Header = ({shoeSidebar, setShowSidebar}) => {
           {/* Profile */}
           <div className="flex justify-center items-center gap-x-2">
             <div className="flex justify-center items-center flex-col text-end">
-              <h2 className="text-sm font-bold">{userInfo?.name} </h2>
-              <span className="text-[14px] w-full font-normal">{userInfo?.role}</span>
+              <h2 className="text-sm font-bold">{displayName}</h2>
+              <span className="text-[14px] w-full font-normal">{userInfo?.role || ''}</span>
             </div>
-            {
-              userInfo?.role === 'admin' || userInfo?.role === 'seller'
-                ? <img className='w-[45px] h-[45px] rounded-full overflow-hidden' src={userInfo?.image ? userInfo?.image : "https://res.cloudinary.com/dpd5xwjqp/image/upload/v1757668954/Misam_Marifa_Fashion_World_oo94yx.png"} alt="admin_image" />
-                : null
-            }
+            {(userInfo?.role === 'admin' || userInfo?.role === 'seller') ? (
+              <img
+                className='w-[45px] h-[45px] rounded-full overflow-hidden object-cover'
+                src={profileImage}
+                alt="admin_image"
+                onError={(e) => { e.currentTarget.src = "https://res.cloudinary.com/dpd5xwjqp/image/upload/v1757668954/Misam_Marifa_Fashion_World_oo94yx.png"; }}
+              />
+            ) : null}
           </div>
         </div>
       </div>

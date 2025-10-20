@@ -1,4 +1,3 @@
-// src/App.js
 import { useEffect, useMemo } from "react";
 import Routers from "./router/Routers";
 import publicRoutes from "./router/routes/publicRoutes";
@@ -7,31 +6,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { get_user_info } from "./store/Reducers/authReducer";
 
 export default function App() {
-  const { token, userLoaded } = useSelector((state) => state.auth);
+  const { token, userLoaded } = useSelector((s) => s.auth);
   const dispatch = useDispatch();
-useEffect(() => {
-  const flat = (routes) =>
-    routes.flatMap((r) => {
-      const self = r.path || "(index)";
-      const kids = r.children ? flat(r.children).map((c) => `${self} -> ${c}`) : [];
-      return [self, ...kids];
-    });
-  console.log("Registered routes (first render):", flat(allRoutes));
-}, [allRoutes]);
-  // token থাকলে user info এনে নিন
+
   useEffect(() => {
     if (token && !userLoaded) {
       dispatch(get_user_info());
     }
-  }, [dispatch, token, userLoaded]);
+  }, [token, userLoaded, dispatch]);
 
-  // সবসময় একই রাউট ট্রি ব্যবহার করুন (reload-safe)
+  // প্রথম রেন্ডারেই সব রুট রেজিস্টার
   const allRoutes = useMemo(() => {
-    const privateTree = getRoutes(); // MainLayout + guarded children
+    const privateTree = getRoutes();
     return [...publicRoutes, privateTree];
   }, []);
 
-  // লোডিং স্ক্রিন (token থাকলে কিন্তু userLoaded হয়নি)
   if (token && !userLoaded) {
     return (
       <div className="w-full h-[60vh] flex items-center justify-center">

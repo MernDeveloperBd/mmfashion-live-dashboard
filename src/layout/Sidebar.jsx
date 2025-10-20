@@ -14,7 +14,7 @@ const Sidebar = ({ shoeSidebar, setShowSidebar }) => {
 
   useEffect(() => {
     const navs = getNavs(role);
-    setAllNav(navs);
+    setAllNav(navs || []);
   }, [role]);
 
   return (
@@ -28,25 +28,26 @@ const Sidebar = ({ shoeSidebar, setShowSidebar }) => {
         aria-hidden={!shoeSidebar}
       />
 
-      {/* Sidebar container */}
+      {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 h-screen w-[260px] bg-[#283046] shadow-[0_0_15px_0_rgb(34_41_47_/_5%)] z-50 transition-all duration-300
         ${shoeSidebar ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} flex flex-col`}
         role="navigation"
         aria-label="Sidebar"
       >
-        {/* Header / Logo */}
+        {/* Logo */}
         <div className="h-[70px] flex justify-center items-center border-b border-slate-700/50 shrink-0">
           <Link to="/" className="w-[180px] h-[50px]">
             <img
               src="https://res.cloudinary.com/dpd5xwjqp/image/upload/v1757668954/Misam_Marifa_Fashion_World_oo94yx.png"
               alt="logo"
               className="w-full h-full object-contain"
+              onError={(e) => { e.currentTarget.src = '/logo.svg'; }}
             />
           </Link>
         </div>
 
-        {/* Scrollable nav area */}
+        {/* Navs */}
         <div className="flex-1 overflow-y-auto px-4 py-2 scrollbar-thin scrollbar-thumb-slate-600/60 scrollbar-track-transparent">
           {allNav.map((nav) => {
             const active = pathname === nav.path;
@@ -68,10 +69,10 @@ const Sidebar = ({ shoeSidebar, setShowSidebar }) => {
           })}
         </div>
 
-        {/* Logout (stick to bottom) */}
+        {/* Logout */}
         <div className="px-4 py-3 border-t border-slate-700/50">
           <button
-            onClick={() => dispatch(logout({ navigate, role }))} 
+            onClick={() => dispatch(logout({ navigate, role }))}
             className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-white bg-teal-600 hover:bg-teal-700 transition-colors cursor-pointer"
             type="button"
           >

@@ -34,7 +34,15 @@ const MainLayout = () => {
       socket.emit('add_admin', userInfo);
     }
   }, [userLoaded, userInfo]);
-
+  useEffect(() => {
+    if (token && !userLoaded) {
+      return (
+        <div className='w-full min-h-screen flex justify-center items-center bg-[#161d31]'>
+          <PropagateLoader color='#00E396' size={15} />
+        </div>
+      );
+    }
+  }, [token, userLoaded])
   useEffect(() => {
     socket.on('activeCustomer', (customers) => {
       dispatch(updateCustomer(customers));

@@ -2,7 +2,7 @@
 
 import axios from 'axios'
 const local = 'http://localhost:5000'
-const production = 'https://mmfashion-live-server.onrender.com'
+const production = 'https://api3.mmfashionworld.com'
 
 let api_url = ''
 let mode = 'pro'

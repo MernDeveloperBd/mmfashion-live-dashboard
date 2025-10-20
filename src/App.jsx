@@ -9,7 +9,15 @@ import { get_user_info } from "./store/Reducers/authReducer";
 export default function App() {
   const { token, userLoaded } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-
+useEffect(() => {
+  const flat = (routes) =>
+    routes.flatMap((r) => {
+      const self = r.path || "(index)";
+      const kids = r.children ? flat(r.children).map((c) => `${self} -> ${c}`) : [];
+      return [self, ...kids];
+    });
+  console.log("Registered routes (first render):", flat(allRoutes));
+}, [allRoutes]);
   // token থাকলে user info এনে নিন
   useEffect(() => {
     if (token && !userLoaded) {

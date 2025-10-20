@@ -30,7 +30,7 @@ const SellerRoutes = [
         ability: 'seller'
     },
     {
-        path: 'seller/dashboard',
+        path: '/seller/dashboard',
         element: <SellerDashboard />,
         role: 'seller',
         status: 'active'

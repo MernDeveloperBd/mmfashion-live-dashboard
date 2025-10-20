@@ -43,8 +43,6 @@ const Header = ({shoeSidebar, setShowSidebar}) => {
 
   // are we on admin/support chat?
   const isOnAdminChat = useMemo(() => {
-    // Change this path to your real Seller->Admin chat route.
-    // e.g., '/seller/dashboard/chat-admin' or '/seller/dashboard/support'
     return location.pathname.includes('/seller/dashboard/chat-admin') ||
            location.pathname.includes('/seller/dashboard/support');
   }, [location.pathname]);
@@ -54,8 +52,6 @@ const Header = ({shoeSidebar, setShowSidebar}) => {
     if (!socket) return;
 
     const onCustomerMessage = (msg) => {
-      // msg: {_id, senderId, senderName, receverId, message, createdAt}
-      // যদি আপনি ইতিমধ্যে ঐ কাস্টোমারের চ্যাটে থাকেন, নোটিফিকেশন না দেই
       if (isOnCustomerChat(msg.senderId)) return;
 
       dispatch(addNotification({
@@ -194,9 +190,9 @@ const Header = ({shoeSidebar, setShowSidebar}) => {
               <span className="text-[14px] w-full font-normal">{userInfo?.role}</span>
             </div>
             {
-              userInfo?.role === 'admin'
-                ? <img className='w-[45px] h-[45px] rounded-full overflow-hidden' src={userInfo.image ? userInfo.image : "https://res.cloudinary.com/dpd5xwjqp/image/upload/v1757668954/Misam_Marifa_Fashion_World_oo94yx.png"} alt="admin_image" />
-                : <img className='w-[45px] h-[45px] rounded-full overflow-hidden' src={userInfo.image ? userInfo.image : "https://res.cloudinary.com/dpd5xwjqp/image/upload/v1757668954/Misam_Marifa_Fashion_World_oo94yx.png"} alt="user_image" />
+              userInfo?.role === 'admin' || userInfo?.role === 'seller'
+                ? <img className='w-[45px] h-[45px] rounded-full overflow-hidden' src={userInfo?.image ? userInfo?.image : "https://res.cloudinary.com/dpd5xwjqp/image/upload/v1757668954/Misam_Marifa_Fashion_World_oo94yx.png"} alt="admin_image" />
+                : null
             }
           </div>
         </div>
